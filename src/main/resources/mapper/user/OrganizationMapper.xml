@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.OrganizationMapper">
+  <resultMap id="BaseResultMap" type="com.rayootech.bean.Organization">
+    <id column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="dept_name" jdbcType="VARCHAR" property="deptName" />
+    <result column="dept_father" jdbcType="VARCHAR" property="deptFather" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+    <result column="post_name" jdbcType="VARCHAR" property="postName" />
+    <result column="post_father" jdbcType="VARCHAR" property="postFather" />
+    <result column="role_name" jdbcType="VARCHAR" property="roleName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    user_id, dept_name, dept_father, user_name, password, nick_name, post_name, post_father, 
+    role_name, create_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from organization
+    where user_id = #{userId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from organization
+    where user_id = #{userId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.rayootech.bean.Organization">
+    insert into organization (user_id, dept_name, dept_father, 
+      user_name, password, nick_name, 
+      post_name, post_father, role_name, 
+      create_time)
+    values (#{userId,jdbcType=BIGINT}, #{deptName,jdbcType=VARCHAR}, #{deptFather,jdbcType=VARCHAR}, 
+      #{userName,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{nickName,jdbcType=VARCHAR}, 
+      #{postName,jdbcType=VARCHAR}, #{postFather,jdbcType=VARCHAR}, #{roleName,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.rayootech.bean.Organization">
+    insert into organization
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="deptName != null">
+        dept_name,
+      </if>
+      <if test="deptFather != null">
+        dept_father,
+      </if>
+      <if test="userName != null">
+        user_name,
+      </if>
+      <if test="password != null">
+        password,
+      </if>
+      <if test="nickName != null">
+        nick_name,
+      </if>
+      <if test="postName != null">
+        post_name,
+      </if>
+      <if test="postFather != null">
+        post_father,
+      </if>
+      <if test="roleName != null">
+        role_name,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userId != null">
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="deptName != null">
+        #{deptName,jdbcType=VARCHAR},
+      </if>
+      <if test="deptFather != null">
+        #{deptFather,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null">
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="nickName != null">
+        #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="postName != null">
+        #{postName,jdbcType=VARCHAR},
+      </if>
+      <if test="postFather != null">
+        #{postFather,jdbcType=VARCHAR},
+      </if>
+      <if test="roleName != null">
+        #{roleName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+
+  <insert id="insertOrganizations" parameterType="java.util.List" useGeneratedKeys="true">
+    insert into organization ( dept_name, dept_father, user_name, password, nick_name, post_name, post_father,
+    role_name)
+    VALUES
+    <foreach item="organization" collection="list"  separator=","  >
+      (
+      #{organization.deptName,jdbcType=VARCHAR}, #{organization.deptFather,jdbcType=VARCHAR},
+      #{organization.userName,jdbcType=VARCHAR}, #{organization.password,jdbcType=VARCHAR},
+      #{organization.nickName,jdbcType=VARCHAR}, #{organization.postName,jdbcType=VARCHAR},
+      #{organization.postFather,jdbcType=VARCHAR}, #{organization.roleName,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
+
+
+  <select id="getAllOrganizations"  resultMap="BaseResultMap">
+    select
+    *
+    from organization
+  </select>
+
+
+
+
+
+
+
+
+
+
+
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.rayootech.bean.Organization">
+    update organization
+    <set>
+      <if test="deptName != null">
+        dept_name = #{deptName,jdbcType=VARCHAR},
+      </if>
+      <if test="deptFather != null">
+        dept_father = #{deptFather,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null">
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="nickName != null">
+        nick_name = #{nickName,jdbcType=VARCHAR},
+      </if>
+      <if test="postName != null">
+        post_name = #{postName,jdbcType=VARCHAR},
+      </if>
+      <if test="postFather != null">
+        post_father = #{postFather,jdbcType=VARCHAR},
+      </if>
+      <if test="roleName != null">
+        role_name = #{roleName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where user_id = #{userId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rayootech.bean.Organization">
+    update organization
+    set dept_name = #{deptName,jdbcType=VARCHAR},
+      dept_father = #{deptFather,jdbcType=VARCHAR},
+      user_name = #{userName,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      nick_name = #{nickName,jdbcType=VARCHAR},
+      post_name = #{postName,jdbcType=VARCHAR},
+      post_father = #{postFather,jdbcType=VARCHAR},
+      role_name = #{roleName,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where user_id = #{userId,jdbcType=BIGINT}
+  </update>
+</mapper>

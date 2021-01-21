@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.MenuMapper">
+    
+    <resultMap type="com.rayootech.bean.Menu" id="MenuResult">
+        <result property="menuId"    column="menu_id"    />
+        <result property="menuName"    column="menu_name"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="orderNum"    column="order_num"    />
+        <result property="path"    column="path"    />
+        <result property="component"    column="component"    />
+        <result property="isFrame"    column="is_frame"    />
+        <result property="isCache"    column="is_cache"    />
+        <result property="menuType"    column="menu_type"    />
+        <result property="visible"    column="visible"    />
+        <result property="status"    column="status"    />
+        <result property="perms"    column="perms"    />
+        <result property="icon"    column="icon"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectMenuVo">
+        select menu_id, menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_time, update_time from menu
+    </sql>
+
+    <select id="selectMenuList" parameterType="Menu" resultMap="MenuResult">
+        <include refid="selectMenuVo"/>
+        <where>
+            <if test="menuName != null and menuName != ''">
+                AND menu_name like concat('%', #{menuName}, '%')
+            </if>
+            <if test="visible != null and visible != ''">
+                AND visible = #{visible}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+        order by parent_id, order_num
+    </select>
+    
+    <select id="selectMenuById" parameterType="Long" resultMap="MenuResult">
+        <include refid="selectMenuVo"/>
+        where menu_id = #{menuId}
+    </select>
+    <select id="queryMenuByName" parameterType="string" resultType="int">
+        select count(*) from  menu where menu_name = #{param}
+    </select>
+    <select id="queryMenuByParent" resultType="java.lang.Integer">
+        select count(*) from  menu where parent_id = #{param}
+    </select>
+
+    <insert id="insertMenu" parameterType="Menu" useGeneratedKeys="true" keyProperty="menuId">
+        insert into menu
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="menuName != null and menuName != ''">menu_name,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="orderNum != null">order_num,</if>
+            <if test="path != null">path,</if>
+            <if test="component != null">component,</if>
+            <if test="isFrame != null">is_frame,</if>
+            <if test="isCache != null">is_cache,</if>
+            <if test="menuType != null">menu_type,</if>
+            <if test="visible != null">visible,</if>
+            <if test="status != null">status,</if>
+            <if test="perms != null">perms,</if>
+            <if test="icon != null">icon,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="menuName != null and menuName != ''">#{menuName},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="orderNum != null">#{orderNum},</if>
+            <if test="path != null">#{path},</if>
+            <if test="component != null">#{component},</if>
+            <if test="isFrame != null">#{isFrame},</if>
+            <if test="isCache != null">#{isCache},</if>
+            <if test="menuType != null">#{menuType},</if>
+            <if test="visible != null">#{visible},</if>
+            <if test="status != null">#{status},</if>
+            <if test="perms != null">#{perms},</if>
+            <if test="icon != null">#{icon},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMenu" parameterType="Menu">
+        update menu
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="menuName != null and menuName != ''">menu_name = #{menuName},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="path != null">path = #{path},</if>
+            <if test="component != null">component = #{component},</if>
+            <if test="isFrame != null">is_frame = #{isFrame},</if>
+            <if test="isCache != null">is_cache = #{isCache},</if>
+            <if test="menuType != null">menu_type = #{menuType},</if>
+            <if test="visible != null">visible = #{visible},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="perms != null">perms = #{perms},</if>
+            <if test="icon != null">icon = #{icon},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where menu_id = #{menuId}
+    </update>
+
+    <delete id="deleteMenuById" parameterType="Long">
+        delete from menu where menu_id = #{menuId}
+    </delete>
+
+    <delete id="deleteMenuByIds" parameterType="String">
+        delete from menu where menu_id in
+        <foreach item="menuId" collection="array" open="(" separator="," close=")">
+            #{menuId}
+        </foreach>
+    </delete>
+
+
+    <select id="selectMenuListByRoleId" resultType="java.lang.Integer">
+        select menu_id from role_menu where role_id = #{param1}
+    </select>
+
+    <select id="queryMenuAll" resultMap="MenuResult">
+        select * from menu where menu_type in ('M','C') order by parent_id, order_num
+    </select>
+
+    <select id="queryMenuByUserId" resultMap="MenuResult">
+          SELECT * FROM (select DISTINCT menu_id from user_role u left join role_menu r on u.role_id = r.role_id WHERE user_id = #{param}) t LEFT JOIN menu on t.menu_id = menu.menu_id where menu_type in ('M','C') order by parent_id, order_num
+    </select>
+
+    <select id="getParentType" resultType="string">
+        select menu_type FROM menu WHERE menu_id = #{parentId}
+    </select>
+
+</mapper>

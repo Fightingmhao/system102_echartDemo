@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.deliver.FeedbackMapper">
+
+    <resultMap type="Feedback" id="FeedbackResult">
+        <result property="backId"    column="back_id"    />
+        <result property="backName"    column="back_name"    />
+        <result property="backResult"    column="back_result"    />
+        <result property="backEvalua"    column="back_evalua"    />
+        <result property="backOfferLow"    column="back_offerLow"    />
+        <result property="backOfferHigh"    column="back_offerHigh"    />
+        <result property="backState"    column="back_state"    />
+        <result property="backCreatetime"    column="back_createTime"    />
+        <result property="backIp"    column="back_ip"    />
+        <result property="viewId"    column="view_id"    />
+        <result property="deptId"    column="dept_id"    />
+    </resultMap>
+
+    <resultMap type="com.rayootech.bean.Vo.FeedbackResultVo" id="FeedbackResultVo">
+        <result property="canId"    column="can_id"    />
+        <result property="backResult"    column="back_result"    />
+        <result property="backEvalua"    column="back_evalua"    />
+        <result property="backOfferLow"    column="back_offerLow"    />
+        <result property="backOfferHigh"    column="back_offerHigh"    />
+        <result property="backState"    column="back_state"    />
+        <result property="backCreatetime"    column="back_createTime"  />
+        <result property="backIp"    column="back_ip"    />
+        <result property="canProName"    column="can_proName"    />
+        <result property="canName"    column="can_name"    />
+        <result property="canDept"    column="can_dept"    />
+        <result property="canHrname"    column="can_hrName"    />
+        <result property="canHremail"    column="can_hrEmail"    />
+    </resultMap>
+
+    <resultMap id="FeedbackVoResult" type="com.rayootech.bean.Vo.FeedbackVo">
+        <result property="canId"    column="can_id"    />
+        <result property="canProName"    column="can_proName"    />
+        <result property="canDept" column="can_dept" />
+        <result property="canHrname"    column="can_hrName"    />
+        <result property="backResult"    column="back_result"    />
+        <result property="backEvalua"    column="back_evalua"    />
+        <result property="backOfferLow"    column="back_offerLow"    />
+        <result property="backOfferHigh"    column="back_offerHigh"    />
+        <result property="backState"    column="back_state"    />
+        <result property="viewName"    column="view_name"    />
+        <result property="viewTime"    column="view_time"    />
+        <result property="canId"    column="can_id"    />
+        <result property="canProName"    column="can_proName"    />
+        <result property="canDept" column="can_dept" />
+        <result property="canSex"    column="can_sex"    />
+        <result property="canPost"    column="can_post"    />
+        <result property="canHrname"    column="can_hrName"    />
+        <result property="canHremail"    column="can_hrEmail"    />
+        <result property="canResumecopy"    column="can_resumeCopy"    />
+        <result property="canText"    column="can_text"    />
+        <result property="backIp" column="back_ip"/>
+    </resultMap>
+
+    <insert id="insertFeedback" parameterType="Feedback" useGeneratedKeys="true" keyProperty="backId">
+        insert into feedback
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="backName != null and backName != ''">back_name,</if>
+            <if test="backResult != null">back_result,</if>
+            <if test="backEvalua != null">back_evalua,</if>
+            <if test="backOfferLow != null ">back_offerLow,</if>
+            <if test="backOfferHigh != null ">back_offerHigh,</if>
+            <if test="backState != null and backState != ''">back_state,</if>
+            <if test="backCreatetime != null">back_createTime,</if>
+            <if test="backIp != null">back_ip,</if>
+            <if test="viewId != null">view_id,</if>
+            <if test="deptId != null">dept_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="backName != null and backName != ''">#{backName},</if>
+            <if test="backResult != null">#{backResult},</if>
+            <if test="backEvalua != null">#{backEvalua},</if>
+            <if test="backOfferLow != null ">#{backOfferLow},</if>
+            <if test="backOfferHigh != null ">#{backOfferHigh},</if>
+            <if test="backState != null and backState != ''">#{backState},</if>
+            <if test="backCreatetime != null">#{backCreatetime},</if>
+            <if test="backIp != null">#{backIp},</if>
+            <if test="viewId != null">#{viewId},</if>
+            <if test="deptId != null">#{deptId},</if>
+        </trim>
+    </insert>
+
+    <!--查询面试结果-->
+    <select id="selectViewerByDeptName" resultMap="FeedbackResultVo" parameterType="com.rayootech.bean.Vo.FeedbackResultVo">
+        SELECT
+            f.back_result,
+            f.back_evalua,
+            f.back_evalua,
+            f.back_offerLow,
+            f.back_offerHigh,
+            f.back_state,
+            f.back_createTime,
+            f.back_ip,
+            n.can_id,
+            n.can_proName,
+            n.can_dept,
+            n.can_name
+        FROM
+            feedback f
+        JOIN (
+            SELECT
+                m.can_id,
+                m.can_proName,
+                m.can_dept,
+                m.can_name,
+                interview.view_id
+            FROM
+                interview
+            JOIN (
+                SELECT
+                    can_id,
+                    can_proName,
+                    can_dept,
+                    can_name
+                FROM
+                    candidate
+                WHERE
+                    can_dept = #{canDept} and can_resState = 0
+            ) m ON interview.can_id = m.can_id
+        ) n ON n.view_id = f.view_id
+        <where>
+            <if test="canName != null  and canName != ''"> and n.can_name = #{canName}</if>
+            <if test="canProName != null and canProName != '' "> and n.can_proName = #{canProName}</if>
+            <if test="backResult != null"> and f.back_result = #{backResult}</if>
+        </where>
+    </select>
+
+    <!--查询需要面试的人-->
+    <select id="selectFeedbackVo" parameterType="com.rayootech.bean.Vo.FeedbackVo" resultMap="FeedbackVoResult">
+        SELECT
+            *
+            FROM
+            (
+            SELECT
+            view_id,
+            c.can_id,
+            can_name,
+            can_sex,
+            can_post,
+            can_hrEmail,
+            can_text,
+            can_dept,
+            can_hrName,
+            can_proName,
+            view_name,
+            view_time
+            FROM
+            candidate c
+            JOIN interview i ON c.can_id = i.can_id
+            WHERE
+            can_dept = #{canDept}
+            ) m
+            LEFT JOIN feedback f ON m.view_id = f.view_id
+            WHERE
+            back_result IS NULL
+            <if test="canProName != null and canProName != '' ">AND can_proName = #{canProName} </if>
+            <if test="viewName != null and viewName != ''">AND view_name = #{viewName}</if>
+            <if test="canHrname != null and canHrname != '' ">AND can_hrName = #{canHrname} </if>
+    </select>
+
+    <!--查询面试结果-->
+    <select id="selectFeedBackResult" parameterType="com.rayootech.bean.Vo.FeedbackResultVo" resultMap="FeedbackResultVo">
+      SELECT
+            c.can_id,
+            c.can_proName,
+            c.can_dept,
+            c.can_name,
+            c.can_hrEmail,
+            c.can_hrName,
+            s.back_result,
+            s.back_evalua,
+            s.back_offerLow,
+            s.back_offerHigh,
+            s.back_state,
+            s.back_createTime,
+            s.back_ip
+        FROM
+            candidate c
+        JOIN (
+            SELECT
+                i.can_id,
+                back_result,
+                back_evalua,
+                back_offerLow,
+                back_offerHigh,
+                back_state,
+                back_createTime,
+                back_ip
+            FROM
+                interview i
+            JOIN (SELECT * FROM feedback) f ON i.view_id = f.view_id
+        ) s ON c.can_id = s.can_id
+        <where>
+            <if test="canHremail != null and canHremail != ''">
+                c.can_hrEmail in (${canHremail})
+            </if>
+            <if test="canName != null  and canName != ''"> and c.can_name = #{canName}</if>
+            <if test="canProName != null and canProName != '' "> and c.can_proName = #{canProName}</if>
+            <if test="backResult != null  and backResult != ''"> and s.back_result = #{backResult}</if>
+        </where>
+    </select>
+
+    <select id="selectFeedbackAll" parameterType="com.rayootech.bean.Vo.FeedbackVo" resultMap="FeedbackVoResult">
+      SELECT
+            *
+        FROM
+            (
+                SELECT
+                    view_id,
+                    c.can_id,
+                    can_name,
+                    can_sex,
+                    can_post,
+                    can_hrEmail,
+                    can_resumeCopy,
+                    can_dept,
+                    can_hrName,
+                    can_proName,
+                    view_name,
+                    view_time
+                FROM
+                    candidate c
+                JOIN interview i ON c.can_id = i.can_id
+                WHERE
+                    can_dept = #{canDept}
+            ) m
+        LEFT JOIN feedback f ON m.view_id = f.view_id
+    </select>
+
+    <select id="selectSaleFeedBackResult" parameterType="com.rayootech.bean.Vo.FeedbackResultVo" resultMap="FeedbackResultVo">
+        SELECT
+            c.can_id,
+            c.can_proName,
+            c.can_dept,
+            c.can_name,
+            c.can_hrEmail,
+            c.can_hrName,
+            f.back_result,
+            f.back_evalua,
+            f.back_offerLow,
+            f.back_offerHigh,
+            f.back_state,
+            f.back_createTime,
+            f.back_ip
+        FROM
+        sale s
+            JOIN project p ON s.sale_cusCode = p.pro_cusCode
+            JOIN candidate c ON p.pro_name = c.can_proName
+            JOIN interview i ON c.can_id = i.can_id
+            JOIN feedback f ON i.view_id = f.view_id
+       <where>
+           <if test="canHremail != null and canHremail != ''">
+               sale_code in (${canHremail})
+           </if>
+           <if test="canName != null  and canName != ''"> and n.can_name = #{canName}</if>
+           <if test="canProName != null and canProName != '' "> and n.can_proName = #{canProName}</if>
+           <if test="backResult != null  and backResult != ''"> and n.back_result = #{backResult}</if>
+       </where>
+    </select>
+
+
+</mapper>

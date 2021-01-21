@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.PostMapper">
+    <resultMap id="BaseResultMap" type="com.rayootech.bean.Post">
+        <id column="post_id" jdbcType="BIGINT" property="postId"/>
+        <result column="post_name" jdbcType="VARCHAR" property="postName"/>
+        <result column="post_father" jdbcType="BIGINT" property="postFather"/>
+        <result column="dept_id" jdbcType="BIGINT" property="deptId"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    post_id, post_name, post_father, dept_id, create_time
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from post
+        where post_id = #{postId,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from post
+    where post_id in
+        <foreach collection="array" item="postId" open="(" separator="," close=")">
+            #{postId}
+        </foreach>
+  </delete>
+    <insert id="insert" parameterType="com.rayootech.bean.Post">
+    insert into post (post_id, post_name, post_father, 
+      dept_id)
+    values (#{postId,jdbcType=BIGINT}, #{postName,jdbcType=VARCHAR}, #{postFather,jdbcType=BIGINT}, 
+      #{deptId,jdbcType=BIGINT})
+  </insert>
+    <insert id="insertSelective" parameterType="com.rayootech.bean.Post">
+        insert into post
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="postId != null">
+                post_id,
+            </if>
+            <if test="postName != null">
+                post_name,
+            </if>
+            <if test="postFather != null">
+                post_father,
+            </if>
+            <if test="deptId != null">
+                dept_id,
+            </if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="postId != null">
+                #{postId,jdbcType=BIGINT},
+            </if>
+            <if test="postName != null">
+                #{postName,jdbcType=VARCHAR},
+            </if>
+            <if test="postFather != null">
+                #{postFather,jdbcType=BIGINT},
+            </if>
+            <if test="deptId != null">
+                #{deptId,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.rayootech.bean.Post">
+        update post
+        <set>
+            <if test="postName != null">
+                post_name = #{postName,jdbcType=VARCHAR},
+            </if>
+            <if test="postFather != null">
+                post_father = #{postFather,jdbcType=BIGINT},
+            </if>
+            <if test="deptId != null">
+                dept_id = #{deptId,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </set>
+        where post_id = #{postId,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.rayootech.bean.Post">
+    update post
+    set post_name = #{postName,jdbcType=VARCHAR},
+      post_father = #{postFather,jdbcType=BIGINT},
+      dept_id = #{deptId,jdbcType=BIGINT}
+    where post_id = #{postId,jdbcType=BIGINT}
+  </update>
+
+
+    <select id="selectPostList" resultMap="BaseResultMap">
+    select
+    *
+    from post
+  </select>
+
+
+    <select id="getPostList" parameterType="long" resultMap="BaseResultMap">
+    select * from post where post_id in (select post_id from user_post where user_id = #{userId,jdbcType=BIGINT})
+  </select>
+
+
+</mapper>

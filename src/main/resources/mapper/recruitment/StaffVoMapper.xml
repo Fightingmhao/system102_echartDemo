@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.recruitment.StaffVoMapper">
+
+    <resultMap type="StaffVo" id="StaffVoResult">
+		<result property="staffCode"    column="staff_code"    />
+        <result property="canId"    column="can_id"    />
+        <result property="canDept"    column="can_dept"    />
+		<result property="canProName" column="can_proName"/>
+		<result property="canPost"    column="can_post"    />
+		<result property="canPhone"    column="can_phone"    />
+		<result property="canCard"    column="can_card"    />
+        <result property="talksName"    column="talks_name"    />
+        <result property="talksResult"    column="talks_result"    />
+        <result property="talksSalary"    column="talks_salary"    />
+        <result property="staffCost" column="staff_cost"/>
+        <result property="staffState" column="staff_state"/>
+        <result property="talksTime"    column="talks_time"    />
+		<result property="talksStaffTime" column="talks_staffTime"/>
+        <result property="talksState"    column="talks_state"    />
+        <result property="talksId"    column="talks_id"    />
+
+        <result property="staffName" column="staff_name"/>
+        <result property="staffSalary" column="staff_salary"/>
+        <result property="staffTime" column="staff_time"/>
+        <result property="staffOutTime" column="staff_outTime"/>
+        <result property="staffOutReason" column="staff_outReason"/>
+        <result property="staffInReview" column="staff_inReview"/>
+        <result property="staffId" column="staff_id"/>
+		<result property="staffCreatetime" column="staff_createTime"/>
+		<result property="staffIp" column="staff_ip"/>
+
+		<result property="staffPost"    column="staff_post"    />
+		<result property="staffCard"    column="staff_card"    />
+		<result property="staffPhone"    column="staff_phone"    />
+		<result property="staffRuTime"    column="staff_ruTime"    />
+		<result property="staffComputer"    column="staff_computer"    />
+		<result property="staffIsOut"    column="staff_isOut"    />
+		<result property="staffOutNum"    column="staff_outNum"    />
+		<result property="staffCompany"    column="staff_company"    />
+		<result property="staffComCost"    column="staff_comCost"    />
+		<result property="staffProbation"    column="staff_probation"    />
+    </resultMap>
+
+    <select id="getStaff"  resultMap="StaffVoResult" parameterType="StaffVo">
+
+SELECT
+	c.can_id,
+	t.talks_id,
+	c.can_dept,
+	t.talks_name,
+	t.talks_salary,
+	t.talks_time,
+	t.talks_result,
+	t.talks_state
+
+FROM
+	candidate c
+	JOIN ( SELECT can_id,talks_id, talks_name, talks_result,talks_state, talks_salary, talks_time FROM talks
+		<where>
+			<if test="talksName != null and talksName != ''">and talks_name like concat('%', #{talksName}, '%')</if>
+		</where>
+		) t ON t.can_id = c.can_id
+		<where>
+			<if test="canDept != null and canDept != ''">and can_dept like concat('%', #{canDept}, '%')</if>
+		</where>
+</select>
+
+    <select id="getStaffList" parameterType="StaffVo" resultMap="StaffVoResult">
+SELECT
+		can_dept,
+		c.can_id,
+		c.staff_name,
+		c.staff_code,
+		c.staff_salary,
+		c.staff_cost,
+		c.staff_time,
+		c.staff_outTime,
+		c.staff_outReason,
+		c.staff_inReview,
+		c.staff_state,
+		c.staff_post,
+		c.staff_card,
+		c.staff_phone,
+		c.staff_ruTime,
+		c.staff_computer,
+		c.staff_isOut,
+		c.staff_outNum,
+		c.staff_company,
+		c.staff_comCost,
+		c.staff_probation,
+		c.staff_id,
+		c.staff_ip,
+		c.staff_createTime
+FROM
+candidate
+JOIN(
+SELECT
+		can_id,
+		s.staff_name,
+		s.staff_code,
+		s.staff_salary,
+		s.staff_cost,
+		s.staff_time,
+		s.staff_outTime,
+		s.staff_outReason,
+		s.staff_inReview,
+		s.staff_state,
+		s.staff_post,
+		s.staff_card,
+		s.staff_phone,
+		s.staff_ruTime,
+		s.staff_computer,
+		s.staff_isOut,
+		s.staff_outNum,
+		s.staff_company,
+		s.staff_comCost,
+		s.staff_probation,
+		s.staff_id,
+		s.staff_ip,
+		s.staff_createTime
+from talks JOIN  staff s on s.talks_id = talks.talks_id
+  <where>
+	  <if test="staffName != null and staffName != ''">and staff_name like concat('%', #{staffName}, '%')</if>
+	  <if test="staffState != null ">and staff_state = #{staffState} </if>
+  </where>
+) c on  c.can_id = candidate.can_id
+		<where>
+			<if test="canDept != null and canDept != ''">and can_dept = #{UserName}</if>
+		</where>
+
+    </select>
+
+    <select id="getStaffById" resultMap="StaffVoResult" parameterType="integer">
+
+  SELECT
+  can_dept,
+	can_phone,
+	can_post,
+  c.can_id,
+	c.talks_salary,
+	c.talks_time,
+	c.talks_staffTime,
+	c.staff_name,
+	c.staff_code,
+	c.staff_salary,
+	c.staff_cost,
+	c.staff_time,
+	c.staff_outTime,
+	c.staff_outReason,
+	c.staff_inReview,
+	c.staff_state,
+	c.staff_post,
+	c.staff_card,
+	c.staff_phone,
+	c.staff_ruTime,
+	c.staff_computer,
+	c.staff_isOut,
+	c.staff_outNum,
+	c.staff_company,
+	c.staff_comCost,
+	c.staff_probation,
+	c.staff_id
+
+FROM
+candidate
+JOIN(
+SELECT
+  can_id,
+	t.talks_salary,
+	t.talks_time,
+	t.talks_staffTime,
+	s.staff_name,
+	s.staff_code,
+	s.staff_salary,
+	s.staff_cost,
+	s.staff_time,
+	s.staff_outTime,
+	s.staff_outReason,
+	s.staff_inReview,
+	s.staff_state,
+	s.staff_post,
+	s.staff_card,
+	s.staff_phone,
+	s.staff_ruTime,
+	s.staff_computer,
+	s.staff_isOut,
+	s.staff_outNum,
+	s.staff_company,
+	s.staff_comCost,
+	s.staff_probation,
+	s.staff_id
+from talks t  JOIN  staff s on s.talks_id = t.talks_id WHERE s.staff_id = #{staffId}) c on  c.can_id = candidate.can_id
+    </select>
+
+	<select id="getTalksNameList" parameterType="string" resultMap="StaffVoResult">
+		SELECT
+	c.can_id,
+	c.can_post,
+	c.can_card,
+    c.can_phone,
+  	c.can_proName,
+	t.talks_id,
+	c.can_dept,
+	t.talks_name,
+	t.talks_salary,
+	t.talks_time,
+	t.talks_result,
+	t.talks_state,
+	t.talks_staffTime
+
+FROM
+	candidate c
+	JOIN ( SELECT can_id,talks_id, talks_name, talks_result,talks_state, talks_salary, talks_time,talks_staffTime FROM talks WHERE talks_name = #{talksName}) t ON t.can_id = c.can_id
+
+	</select>
+
+	<select id="getTalksName" parameterType="string" resultType="string">
+		SELECT
+			  m.talks_name
+		   FROM
+			  (
+				 SELECT
+					t.talks_id,
+					talks_name
+				 FROM
+					candidate c
+				 JOIN talks t ON c.can_id = t.can_id
+				 WHERE
+					can_dept = #{deptName} and talks_result = 0
+			  ) m
+		   LEFT JOIN staff s ON s.talks_id = m.talks_id
+		   WHERE
+			  staff_state IS NULL
+	</select>
+
+	<select id="getStaffName" resultType="string" parameterType="string">
+		/*select staff_name from staff where staff_state = 0*/
+		select can_name from candidate where can_dept = #{canDept} and can_id in(select can_id from talks where talks_id in(select talks_id from staff where staff_state = 0))
+	</select>
+
+
+</mapper>

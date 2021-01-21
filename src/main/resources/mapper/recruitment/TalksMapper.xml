@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.recruitment.TalksMapper">
+    
+    <resultMap type="Talks" id="TalksResult">
+        <result property="canId"    column="can_id"    />
+        <result property="talksId"    column="talks_id"    />
+        <result property="backId"    column="back_id"    />
+        <result property="talksName"    column="talks_name"    />
+        <result property="talksResult"    column="talks_result"    />
+        <result property="talksSalary"    column="talks_salary"    />
+        <result property="talksTime"    column="talks_time"    />
+        <result property="talksCreatetime"    column="talks_createTime"    />
+        <result property="talksIp"    column="talks_ip"    />
+        <result property="talksState"    column="talks_state"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="talksStaffTime" column="talks_staffTime"/>
+    </resultMap>
+
+    <sql id="selectTalksVo">
+        select  talks_id, back_id, talks_name, talks_result, talks_salary, talks_time, talks_createTime, talks_ip, talks_state, dept_id from talks
+    </sql>
+
+    <!--<select id="selectTalksList" parameterType="Talks" resultMap="TalksResult">
+        <include refid="selectTalksVo"/>
+        <where>  
+            <if test="talksName != null  and talksName != ''"> and talks_name like concat('%', #{talksName}, '%')</if>
+            <if test="talksTime != null "> and talks_time = #{talksTime}</if>
+            <if test="talksCreatetime != null "> and talks_createTime = #{talksCreatetime}</if>
+        </where>
+    </select>-->
+    
+    <select id="getTalksById" parameterType="Long" resultMap="TalksResult">
+        <include refid="selectTalksVo"/>
+        where talks_id = #{talksId}
+    </select>
+
+    <insert id="insertTalks" parameterType="Talks" >
+        insert into talks
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="talksId != null">talks_id,</if>
+            <if test="canId != null">can_id,</if>
+            <if test="backId != null">back_id,</if>
+            <if test="talksName != null">talks_name,</if>
+            <if test="talksResult != null">talks_result,</if>
+            <if test="talksSalary != null">talks_salary,</if>
+            <if test="talksTime != null">talks_time,</if>
+            <if test="talksCreatetime != null">talks_createTime,</if>
+            <if test="talksIp != null">talks_ip,</if>
+            <if test="talksState != null">talks_state,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="talksStaffTime != null">talks_staffTime,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="talksId != null">#{talksId},</if>
+            <if test="canId != null">#{canId},</if>
+            <if test="backId != null">#{backId},</if>
+            <if test="talksName != null">#{talksName},</if>
+            <if test="talksResult != null">#{talksResult},</if>
+            <if test="talksSalary != null">#{talksSalary},</if>
+            <if test="talksTime != null">#{talksTime},</if>
+            <if test="talksCreatetime != null">#{talksCreatetime},</if>
+            <if test="talksIp != null">#{talksIp},</if>
+            <if test="talksState != null">#{talksState},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="talksStaffTime != null">#{talksStaffTime},</if>
+         </trim>
+    </insert>
+
+    <!--更新谈判结果-->
+    <update id="updateTalks" parameterType="Talks">
+        update talks
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="backId != null">back_id = #{backId},</if>
+            <if test="talksName != null">talks_name = #{talksName},</if>
+            <if test="talksResult != null">talks_result = #{talksResult},</if>
+            <if test="talksSalary != null">talks_salary = #{talksSalary},</if>
+            <if test="talksTime != null">talks_time = #{talksTime},</if>
+            <if test="talksCreatetime != null">talks_createTime = #{talksCreatetime},</if>
+            <if test="talksIp != null">talks_ip = #{talksIp},</if>
+            <if test="talksState != null">talks_state = #{talksState},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="talksStaffTime != null">talks_staffTime = #{talksStaffTime}</if>
+        </trim>
+        where talks_id = #{talksId}
+    </update>
+
+
+
+    <select id="getOffer" resultMap="TalksResult">
+        <include refid="selectTalksVo"/>
+          where talks_result = '0'
+    </select>
+
+    <resultMap type="com.rayootech.bean.Vo.TalksResultVo" id="TalksResultVoResult">
+        <result property="canProName"    column="can_proName"    />
+        <result property="canDept" column="can_dept" />
+        <result property="canHrname"    column="can_hrName"    />
+        <result property="canHremail"    column="can_hrEmail"    />
+        <result property="talksId"    column="talks_id"    />
+        <result property="talksName"    column="talks_name"    />
+        <result property="talksResult"    column="talks_result"    />
+        <result property="talksSalary"    column="talks_salary"    />
+        <result property="talksTime"    column="talks_time"    />
+        <result property="talksCreatetime"    column="talks_createTime"    />
+        <result property="talksIp"    column="talks_ip"    />
+        <result property="talksState"    column="talks_state"    />
+        <result property="talksStaffTime" column="talks_staffTime"/>
+    </resultMap>
+
+    <!--通过Hr邮箱查询谈判结果-->
+    <select id="selectTalksResult" parameterType="com.rayootech.bean.Vo.TalksResultVo" resultMap="TalksResultVoResult">
+      SELECT
+        talks_id,
+        can_proName,
+        can_dept,
+        can_post,
+        can_hrEmail,
+        can_hrName,
+        talks_name,
+        talks_result,
+        talks_salary,
+        talks_time,
+        talks_staffTime,
+        talks_state,
+        talks_createTime,
+        talks_ip
+    FROM
+        candidate c
+    JOIN talks t ON c.can_id = t.can_id
+        <where>
+            <if test="canHremail != null and canHremail != ''">
+                and can_hrEmail IN (${canHremail})
+            </if>
+            <if test="canProName != null and canProName != ''">and can_proName = #{canProName}</if>
+            <if test="canDept != null and canDept != ''">and can_dept = #{canDept}</if>
+            <if test="talksResult != null">and talks_result = #{talksResult}</if>
+        </where>
+    </select>
+
+    <select id="selectTalksResultById" parameterType="int" resultMap="TalksResultVoResult">
+        SELECT
+            talks_id,
+            can_proName,
+            can_dept,
+            can_post,
+            can_hrEmail,
+            can_hrName,
+            talks_name,
+            talks_result,
+            talks_salary,
+            talks_time,
+            talks_staffTime,
+            talks_state,
+            talks_createTime,
+            talks_ip
+        FROM
+            candidate c
+        JOIN talks t ON c.can_id = t.can_id
+        WHERE
+            talks_id = #{talksId}
+    </select>
+
+
+</mapper>

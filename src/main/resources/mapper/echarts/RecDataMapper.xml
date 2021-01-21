@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.echarts.RecDataMapper">
+
+    <resultMap type="com.rayootech.bean.Vo.echartsVo.RecDataVo" id="RecDataVoResult">
+        <result property="recId"    column="rec_id"    />
+        <result property="recProName"    column="rec_proName"    />
+        <result property="recDept" column="rec_dept" />
+        <result property="recHrname"    column="rec_hrName"    />
+        <result property="recHrEmail" column="rec_hrEmail"/>
+        <result property="resumeCount"    column="resume_count"    />
+        <result property="resumePassCount"    column="resume_passCount"    />
+        <result property="interviewCount"    column="interview_count"    />
+        <result property="takeCount"    column="take_count"    />
+        <result property="passCount"    column="pass_count"    />
+        <result property="talksEntryCount"    column="talks_entryCount"    />
+        <result property="entryCount"    column="entry_count"    />
+        <result property="leaveCount"    column="leave_count"    />
+        <result property="monthTime"    column="month_time"    />
+    </resultMap>
+
+    <resultMap type="com.rayootech.bean.Vo.echartsVo.RecData" id="RecDataResult">
+        <result property="recId"    column="rec_id"    />
+        <result property="recProName"    column="rec_proName"    />
+        <result property="recDept" column="rec_dept" />
+        <result property="recHrname"    column="rec_hrName"    />
+        <result property="recHrEmail" column="rec_hrEmail"/>
+        <result property="resumeCount"    column="resume_count"    />
+        <result property="resumePassCount"    column="resume_passCount"    />
+        <result property="interviewCount"    column="interview_count"    />
+        <result property="takeCount"    column="take_count"    />
+        <result property="passCount"    column="pass_count"    />
+        <result property="talksEntryCount"    column="talks_entryCount"    />
+        <result property="entryCount"    column="entry_count"    />
+        <result property="leaveCount"    column="leave_count"    />
+        <result property="monthTime"    column="month_time"    />
+    </resultMap>
+
+    <select id="getProName" parameterType="string" resultType="string">
+        select distinct rec_proName from recdata where rec_hrEmail in (${uName})
+    </select>
+
+    <select id="getData" parameterType="com.rayootech.bean.Vo.echartsVo.RecDataVo" resultMap="RecDataVoResult">
+        select
+        sum(resume_count) resume_count,sum(resume_passCount) resume_passCount,sum(interview_count)
+        interview_count,sum(take_count) take_count,sum(pass_count) pass_count,sum(talks_entryCount)
+        talks_entryCount,sum(entry_count) entry_count,sum(leave_count) leave_count
+        from (
+        select
+        QUARTER(month_time) as seasons,
+        rec_hrName,rec_hrEmail,rec_proName,rec_dept,resume_count,resume_passCount,interview_count,take_count,pass_count,talks_entryCount,entry_count,leave_count
+        ,month_time
+        from recdata
+        <where>
+            <if test="recHrEmail != null and recHrEmail != ''">and rec_hrEmail in (${recHrEmail})</if>
+            <if test="hrEmail != null and hrEmail != ''">and rec_hrEmail = #{hrEmail}</if>
+            <if test="recProName != null and recProName != ''">and rec_proName = #{recProName}</if>
+            <if test="monthTime != null">and DATE_FORMAT(month_time , '%Y-%m' ) = DATE_FORMAT(#{monthTime}, '%Y-%m' )</if>
+            <if test="yearTime != null">and year(month_time)= #{yearTime}</if>
+        </where>) r
+        <where>
+            <if test="season != null">and seasons = #{season}</if>
+        </where>
+    </select>
+
+<select id="getDataSale" parameterType="com.rayootech.bean.Vo.echartsVo.RecDataVo" resultMap="RecDataVoResult">
+    select
+    sum(resume_count) resume_count,sum(resume_passCount) resume_passCount,sum(interview_count)
+    interview_count,sum(take_count) take_count,sum(pass_count) pass_count,sum(talks_entryCount)
+    talks_entryCount,sum(entry_count) entry_count,sum(leave_count) leave_count
+    from (
+    SELECT
+    QUARTER(month_time) as seasons,
+    rec_hrName,rec_hrEmail,rec_proName,rec_dept,resume_count,resume_passCount,interview_count,take_count,pass_count,talks_entryCount,entry_count,leave_count
+    ,month_time
+    FROM
+    recdata
+    WHERE
+    rec_proName IN ( SELECT pro_name FROM project WHERE pro_cusCode IN (
+    SELECT sale_cusCode FROM sale
+    WHERE sale_code IN (${recHrEmail} )
+    <if test="recProName != null and recProName != ''">and rec_proName = #{recProName}</if>
+    ) )
+    <if test="monthTime != null">and DATE_FORMAT(month_time , '%Y-%m' ) = DATE_FORMAT(#{monthTime}, '%Y-%m' )</if>
+    <if test="yearTime != null">and year(month_time)= #{yearTime}</if>
+    ) r
+    <where>
+        <if test="season != null">and seasons = #{season}</if>
+    </where>
+</select>
+    <select id="getEmail" parameterType="string" resultType="string">
+SELECT
+	rec_hrEmail
+FROM
+	recdata
+WHERE
+	rec_proName IN ( SELECT pro_name FROM project WHERE pro_cusCode IN ( SELECT sale_cusCode FROM sale WHERE sale_code IN (${hrEmail} ) ) )
+    </select>
+
+    <select id="deliverProName" parameterType="string" resultType="string">
+ SELECT DISTINCT
+	rec_proName
+FROM
+	recdata
+WHERE
+	rec_dept = ( SELECT org_name FROM org WHERE org_id = ( SELECT dept_id FROM `user` WHERE user_name = #{uName}
+	) )
+    </select>
+
+    <select id="deliverData" parameterType="com.rayootech.bean.Vo.echartsVo.RecDataVo" resultMap="RecDataVoResult">
+        select
+        sum(resume_count) resume_count,sum(resume_passCount) resume_passCount,sum(interview_count)
+        interview_count,sum(take_count) take_count,sum(pass_count) pass_count,sum(talks_entryCount)
+        talks_entryCount,sum(entry_count) entry_count,sum(leave_count) leave_count
+        FROM
+        (SELECT
+        QUARTER(month_time)  as seasons,
+        rec_hrName,rec_hrEmail,rec_proName,rec_dept,resume_count,resume_passCount,interview_count,take_count,pass_count,talks_entryCount,entry_count,leave_count ,month_time
+
+        FROM
+        recdata
+        WHERE
+        rec_dept = ( SELECT org_name FROM org WHERE org_id = ( SELECT dept_id FROM `user` WHERE user_name =
+        #{recHrEmail} ) )
+        <if test="recProName != null and recProName != ''">and rec_proName = #{recProName}</if>
+        <if test="monthTime != null">and DATE_FORMAT(month_time , '%Y-%m' ) = DATE_FORMAT(#{monthTime}, '%Y-%m' )</if>
+        <if test="yearTime != null">and year(month_time)= #{yearTime}</if>
+        ) r
+        <where>
+            <if test="season != null">and seasons = #{season}</if>
+        </where>
+    </select>
+
+
+
+
+</mapper>

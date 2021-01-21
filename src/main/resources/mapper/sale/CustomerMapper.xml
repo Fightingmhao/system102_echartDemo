@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.sale.CustomerMapper">
+    
+    <resultMap type="Customer" id="CustomerResult">
+        <result property="cusId"    column="cus_id"    />
+        <result property="cusName"    column="cus_name"    />
+        <result property="cusIntroduce"    column="cus_introduce"    />
+        <result property="cusDock"    column="cus_dock"    />
+        <result property="cusPhone"    column="cus_phone"    />
+        <result property="cusAddress"    column="cus_address"    />
+        <result property="cusSalecode"    column="cus_saleCode"    />
+        <result property="cusContacttime"    column="cus_contactTime"    />
+        <result property="cusState"    column="cus_state"    />
+        <result property="cusRemarks"    column="cus_remarks"    />
+        <result property="cusTime"    column="cus_time"    />
+        <result property="cusIp"    column="cus_ip"    />
+    </resultMap>
+
+    <sql id="selectCustomerVo">
+        select cus_id, cus_name, cus_introduce, cus_dock, cus_phone, cus_address, cus_saleCode, cus_contactTime, cus_state, cus_remarks, cus_time, cus_ip from customer
+    </sql>
+
+    <select id="selectCustomerList" parameterType="Customer" resultMap="CustomerResult">
+        <include refid="selectCustomerVo"/>
+        <where>
+            <if test="cusName != null  and cusName != ''"> and cus_name like concat('%', #{cusName}, '%')</if>
+            <if test="cusDock != null  and cusDock != ''"> and cus_dock = #{cusDock}</if>
+            <if test="cusState != null "> and cus_state = #{cusState}</if>
+        </where>
+    </select>
+    
+    <select id="selectCustomerById" parameterType="Long" resultMap="CustomerResult">
+        <include refid="selectCustomerVo"/>
+        where cus_id = #{cusId}
+    </select>
+        
+    <insert id="insertCustomer" parameterType="Customer">
+        insert into customer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="cusId != null">cus_id,</if>
+            <if test="cusName != null">cus_name,</if>
+            <if test="cusIntroduce != null">cus_introduce,</if>
+            <if test="cusDock != null">cus_dock,</if>
+            <if test="cusPhone != null">cus_phone,</if>
+            <if test="cusAddress != null">cus_address,</if>
+            <if test="cusSalecode != null">cus_saleCode,</if>
+            <if test="cusContacttime != null">cus_contactTime,</if>
+            <if test="cusState != null">cus_state,</if>
+            <if test="cusRemarks != null">cus_remarks,</if>
+            <if test="cusTime != null">cus_time,</if>
+            <if test="cusIp != null">cus_ip,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="cusId != null">#{cusId},</if>
+            <if test="cusName != null">#{cusName},</if>
+            <if test="cusIntroduce != null">#{cusIntroduce},</if>
+            <if test="cusDock != null">#{cusDock},</if>
+            <if test="cusPhone != null">#{cusPhone},</if>
+            <if test="cusAddress != null">#{cusAddress},</if>
+            <if test="cusSalecode != null">#{cusSalecode},</if>
+            <if test="cusContacttime != null">#{cusContacttime},</if>
+            <if test="cusState != null">#{cusState},</if>
+            <if test="cusRemarks != null">#{cusRemarks},</if>
+            <if test="cusTime != null">#{cusTime},</if>
+            <if test="cusIp != null">#{cusIp},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCustomer" parameterType="Customer">
+        update customer
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="cusName != null">cus_name = #{cusName},</if>
+            <if test="cusIntroduce != null">cus_introduce = #{cusIntroduce},</if>
+            <if test="cusDock != null">cus_dock = #{cusDock},</if>
+            <if test="cusPhone != null">cus_phone = #{cusPhone},</if>
+            <if test="cusAddress != null">cus_address = #{cusAddress},</if>
+            <if test="cusSalecode != null">cus_saleCode = #{cusSalecode},</if>
+            <if test="cusContacttime != null">cus_contactTime = #{cusContacttime},</if>
+            <if test="cusState != null">cus_state = #{cusState},</if>
+            <if test="cusRemarks != null">cus_remarks = #{cusRemarks},</if>
+            <if test="cusTime != null">cus_time = #{cusTime},</if>
+            <if test="cusIp != null">cus_ip = #{cusIp},</if>
+        </trim>
+        where cus_id = #{cusId}
+    </update>
+
+   <select id="getCusName" resultMap="CustomerResult">
+      SELECT * FROM customer
+   </select>
+    
+</mapper>

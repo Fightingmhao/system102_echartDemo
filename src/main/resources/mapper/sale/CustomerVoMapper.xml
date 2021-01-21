@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.sale.CustomerVoMapper">
+    
+    <resultMap type="CustomerVo" id="CustomerVoResult">
+        <result property="cusId"    column="cus_id"    />
+        <result property="cusName"    column="cus_name"    />
+        <result property="canHrname" column="can_hrName"/>
+        <result property="cusIntroduce"    column="cus_introduce"    />
+        <result property="cusDock"    column="cus_dock"    />
+        <result property="cusPhone"    column="cus_phone"    />
+        <result property="cusAddress"    column="cus_address"    />
+        <result property="cusSalecode"    column="cus_saleCode"    />
+        <result property="cusContacttime"    column="cus_contactTime"    />
+        <result property="cusState"    column="cus_state"    />
+        <result property="cusRemarks"    column="cus_remarks"    />
+        <result property="cusTime"    column="cus_time"    />
+        <result property="cusIp"    column="cus_ip"    />
+    </resultMap>
+
+    <sql id="selectCustomerVo">
+        select cus_id, cus_name, cus_introduce, cus_dock, cus_phone, cus_address, cus_saleCode, cus_contactTime, cus_state, cus_remarks, cus_time, cus_ip from customer
+    </sql>
+
+
+
+    <select id="selectCustomerList" parameterType="CustomerVo" resultMap="CustomerVoResult">
+        <include refid="selectCustomerVo"/>
+        <where>
+            <if test="cusName != null  and cusName != ''"> and cus_name like concat('%', #{cusName}, '%')</if>
+            <if test="cusDock != null  and cusDock != ''"> and cus_dock = #{cusDock}</if>
+            <if test="cusState != null "> and cus_state = #{cusState}</if>
+            <if test="canHremail != null and canHremail != ''">
+                and cus_saleCode in (${canHremail})
+            </if>
+        </where>
+    </select>
+
+    
+</mapper>

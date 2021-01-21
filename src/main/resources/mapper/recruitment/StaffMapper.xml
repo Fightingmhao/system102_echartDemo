@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.recruitment.StaffMapper">
+
+    <resultMap type="Staff" id="StaffResult">
+        <result property="staffCode"    column="staff_code"    />
+        <result property="staffId"    column="staff_id"    />
+        <result property="talksId"  column="talks_id"/>
+        <result property="staffName"    column="staff_name"    />
+        <result property="staffSalary"    column="staff_salary"    />
+        <result property="staffCost" column="staff_cost"/>
+        <result property="staffTime"    column="staff_time"    />
+        <result property="staffState"    column="staff_state"    />
+        <result property="staffOutTime"    column="staff_outTime"    />
+        <result property="staffOutReason"    column="staff_outReason"    />
+        <result property="staffInReview"    column="staff_inReview"    />
+        <result property="staffCreateTime"    column="staff_createTime"    />
+        <result property="staffIp"    column="staff_ip"    />
+
+        <result property="staffPost"    column="staff_post"    />
+        <result property="staffCard"    column="staff_card"    />
+        <result property="staffPhone"    column="staff_phone"    />
+        <result property="staffRuTime"    column="staff_ruTime"    />
+        <result property="staffComputer"    column="staff_computer"    />
+        <result property="staffIsOut"    column="staff_isOut"    />
+        <result property="staffOutNum"    column="staff_outNum"    />
+        <result property="staffCompany"    column="staff_company"    />
+        <result property="staffComCost"    column="staff_comCost"    />
+        <result property="staffProbation"    column="staff_probation"    />
+    </resultMap>
+
+
+
+    <select id="getStaffList" parameterType="Staff" resultMap="StaffResult">
+        select * from staff where staff_state = 0
+    </select>
+
+    <insert id="insertStaff" parameterType="Staff">
+            insert into staff
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="staffCode !=  null and staffCode != ''">staff_code,</if>
+                <if test="staffId != null and staffId != ''" >staff_id,</if>
+                <if test="talksId != null and talksId != ''">talks_id,</if>
+                <if test="staffName != null and staffName != ''">staff_name,</if>
+                <if test="staffSalary != null and staffSalary != ''">staff_salary,</if>
+                <if test="staffCost != null and staffCost != ''">staff_cost,</if>
+                <if test="staffTime != null ">staff_time,</if>
+                <if test="staffState != null ">staff_state,</if>
+                <if test="staffCreateTime != null ">staff_createTime,</if>
+                <if test="staffIp !=  null and staffIp != ''">staff_ip,</if>
+                <if test="staffPost !=  null and staffPost != ''">staff_post,</if>
+                <if test="staffCard !=  null and staffCard != ''">staff_card,</if>
+                <if test="staffPhone !=  null and staffPhone != ''">staff_phone,</if>
+                <if test="staffRuTime !=  null  ">staff_ruTime,</if>
+                <if test="staffComputer !=  null and staffComputer != ''">staff_computer,</if>
+                <if test="staffIsOut !=  null ">staff_isOut,</if>
+                <if test="staffOutNum !=  null and staffOutNum != ''">staff_outNum,</if>
+                <if test="staffCompany !=  null and staffCompany != ''">staff_company,</if>
+                <if test="staffComCost !=  null and staffComCost != ''">staff_comCost,</if>
+                <if test="staffProbation !=  null and staffProbation != ''">staff_probation</if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="staffCode !=  null and staffCode != ''">#{staffCode},</if>
+                <if test="staffId != null and staffId != ''" >#{staffId},</if>
+                <if test="talksId != null and talksId != ''">#{talksId},</if>
+                <if test="staffName != null and staffName != ''" >#{staffName},</if>
+                <if test="staffSalary != null and staffSalary != ''">#{staffSalary},</if>
+                <if test="staffCost != null and staffCost != ''">#{staffCost},</if>
+                <if test="staffTime != null ">#{staffTime},</if>
+                <if test="staffState != null  ">#{staffState},</if>
+                <if test="staffCreateTime != null ">#{staffCreateTime},</if>
+                <if test="staffIp !=  null and staffIp != ''">#{staffIp},</if>
+
+                <if test="staffPost !=  null and staffPost != ''">#{staffPost},</if>
+                <if test="staffCard !=  null and staffCard != ''">#{staffCard},</if>
+                <if test="staffPhone !=  null and staffPhone != ''">#{staffPhone},</if>
+                <if test="staffRuTime !=  null  ">#{staffRuTime},</if>
+                <if test="staffComputer !=  null and staffComputer != ''">#{staffComputer},</if>
+                <if test="staffIsOut !=  null ">#{staffIsOut},</if>
+                <if test="staffOutNum !=  null and staffOutNum != ''">#{staffOutNum},</if>
+                <if test="staffCompany !=  null and staffCompany != ''">#{staffCompany},</if>
+                <if test="staffComCost !=  null and staffComCost != ''">#{staffComCost},</if>
+                <if test="staffProbation !=  null and staffProbation != ''">#{staffProbation}</if>
+            </trim>
+    </insert>
+
+    <select id="getStaffById" resultMap="StaffResult" parameterType="integer">
+        select * from staff where staff_id = #{staffId}
+    </select>
+
+    <update id="updateStaff" parameterType="Staff">
+        update staff
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="staffCode != null and staffCode != ''">staff_code = #{staffCode},</if>
+            <if test="staffState != null ">staff_state = #{staffState},</if>
+            <if test="staffOutTime != null ">staff_outTime = #{staffOutTime},</if>
+            <if test="staffOutReason != null and staffOutReason != ''">staff_outReason = #{staffOutReason},</if>
+            <if test="staffInReview != null and staffInReview != ''">staff_inReview = #{staffInReview},</if>
+            <if test="staffCreateTime != null ">staff_createTime = #{staffCreateTime},</if>
+            <if test="staffIp != null and staffIp != ''">staff_ip = #{staffIp},</if>
+
+            <if test="staffCard != null and staffCard != ''">staff_card = #{staffCard},</if>
+            <if test="staffComputer != null and staffComputer != ''">staff_computer = #{staffComputer},</if>
+            <if test="staffIsOut != null and staffIsOut != ''">staff_isOut = #{staffIsOut},</if>
+            <if test="staffOutNum != null and staffOutNum != ''">staff_outNum = #{staffOutNum},</if>
+            <if test="staffCompany != null and staffCompany != ''">staff_company = #{staffCompany},</if>
+            <if test="staffComCost != null and staffComCost != ''">staff_comCost = #{staffComCost},</if>
+            <if test="staffProbation != null and staffProbation != ''">staff_probation = #{staffProbation},</if>
+            <if test="staffCost != null and staffCost != ''">staff_cost = #{staffCost},</if>
+
+        </trim>
+        where staff_id = #{staffId}
+    </update>
+
+    <select id="findByStaffCode" resultMap="StaffResult" parameterType="string">
+        select * from staff where staff_code = #{staffCode}
+    </select>
+
+
+</mapper>

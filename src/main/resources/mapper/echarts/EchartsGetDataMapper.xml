@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.echarts.EchartsGetDataMapper">
+
+
+    <select id="getArgeeNum" resultType="int">
+       SELECT count(*) FROM resumecheck WHERE check_state = 0
+    </select>
+
+   <select id="getInterViewNum" resultType="int">
+      select count(*) from interview
+   </select>
+
+  <select id="getJoinInterNum" resultType="int">
+      select count(*) from feedback WHERE back_result != 2
+    </select>
+
+    <select id="getPassedInterViewNum" resultType="int">
+      select count(*) from feedback WHERE back_result = 0
+    </select>
+
+    <select id="getTalkResultNum" resultType="int">
+      SELECT count(*) FROM talks WHERE talks_result = 0
+    </select>
+
+    <select id="getJobNum" resultType="int">
+      SELECT count(*) FROM staff WHERE staff_state = 0
+    </select>
+
+    <select id="getArgeeNumByPro" resultType="int" parameterType="string">
+        SELECT
+            count( * )
+        FROM
+            ( SELECT can_id FROM candidate
+            <where>
+                <if test="param1 != null and param1 != ''">and can_proName = #{param1}</if>
+                <if test="param2 != null and param2!= ''">and can_hrEmail = #{param2}</if>
+            </where>
+            ) m
+            LEFT JOIN ( SELECT * FROM resumecheck WHERE check_state = 0 ) t ON m.can_id = t.can_id
+        WHERE
+            check_id IS NOT NULL
+    </select>
+    <select id="getInterViewNumByPro" resultType="int">
+        SELECT
+            count( * )
+        FROM
+            ( SELECT can_id FROM candidate
+                <where>
+                    <if test="param1 != null and param1 != ''">and can_proName = #{param1}</if>
+                    <if test="param2 != null and param2!= ''">and can_hrEmail = #{param2}</if>
+                </where>
+             ) m
+            LEFT JOIN  interview  t ON m.can_id = t.can_id
+        WHERE
+            view_id IS NOT NULL
+    </select>
+    <select id="getJoinInterNumByPro" resultType="int">
+        SELECT
+            count( * )
+        FROM
+            (
+        SELECT
+            view_id
+        FROM
+            ( SELECT can_id FROM candidate
+                <where>
+                    <if test="param1 != null and param1 != ''">and can_proName = #{param1}</if>
+                    <if test="param2 != null and param2!= ''">and can_hrEmail = #{param2}</if>
+                </where>
+             ) m
+            LEFT JOIN  interview t ON m.can_id = t.can_id
+        WHERE
+            view_id IS NOT NULL
+            ) x
+            JOIN feedback f ON x.view_id = f.view_id
+        WHERE
+            back_result != 2
+    </select>
+
+    <select id="getPassedInterViewNumByPro" resultType="int">
+        SELECT
+            count( * )
+        FROM
+            (
+        SELECT
+            view_id
+        FROM
+            ( SELECT can_id FROM candidate
+                <where>
+                    <if test="param1 != null and param1 != ''">and can_proName = #{param1}</if>
+                    <if test="param2 != null and param2!= ''">and can_hrEmail = #{param2}</if>
+                </where>
+             ) m
+            LEFT JOIN  interview t ON m.can_id = t.can_id
+        WHERE
+            view_id IS NOT NULL
+            ) x
+            JOIN feedback f ON x.view_id = f.view_id
+        WHERE
+            back_result = 0
+    </select>
+    <select id="getTalkResultNumByPro" resultType="int">
+       SELECT
+            count( * )
+        FROM
+            ( SELECT can_id FROM candidate
+                <where>
+                    <if test="param1 != null and param1 != ''">and can_proName = #{param1}</if>
+                    <if test="param2 != null and param2!= ''">and can_hrEmail = #{param2}</if>
+                </where>
+        ) m
+            LEFT JOIN ( SELECT * FROM talks WHERE talks_result = 0 ) t ON m.can_id = t.can_id
+        WHERE
+            talks_id IS NOT NULL
+    </select>
+
+    <select id="getJobNumByPro" resultType="int">
+       SELECT
+            count( * )
+        FROM
+            staff
+        WHERE
+            staff_state = 0
+            AND talks_id IN (
+        SELECT
+            talks_id
+        FROM
+            ( SELECT can_id FROM candidate
+                <where>
+                    <if test="param1 != null and param1 != ''">and can_proName = #{param1}</if>
+                    <if test="param2 != null and param2!= ''">and can_hrEmail = #{param2}</if>
+                </where>
+             ) m
+            LEFT JOIN ( SELECT * FROM talks WHERE talks_result = 0 ) t ON m.can_id = t.can_id
+        WHERE
+            talks_id IS NOT NULL
+            )
+    </select>
+
+    <select id="getDeptPeo" resultType="string">
+        SELECT
+            user_name
+        FROM
+            `user`
+        WHERE
+            post_id IN (
+        SELECT
+            org_id
+        FROM
+            org
+        WHERE
+            ancestors LIKE CONCAT( '%', #{deptId}, '%' )
+            AND org_type = 'P'
+	)
+
+    </select>
+
+    <select id="getArgeeNumByDept" resultType="int" parameterType="string">
+
+        SELECT
+            count( * )
+        FROM
+            (
+        SELECT
+            can_id
+        FROM
+            candidate
+        WHERE
+            can_hrEmail IN (  ${param} )) m
+            LEFT JOIN ( SELECT * FROM resumecheck WHERE check_state = 0 ) t ON m.can_id = t.can_id
+        WHERE
+            check_id IS NOT NULL
+    </select>
+
+    <select id="getInterViewNumByDept" resultType="int" parameterType="string">
+        SELECT
+            count( * )
+        FROM
+            ( SELECT can_id FROM candidate WHERE can_hrEmail IN (${param})) m
+            LEFT JOIN interview t ON m.can_id = t.can_id
+        WHERE
+            view_id IS NOT NULL
+    </select>
+
+    <select id="getJoinInterNumByDept" resultType="int" parameterType="string">
+       SELECT
+            count( * )
+        FROM
+            (
+        SELECT
+            view_id
+        FROM
+            ( SELECT can_id FROM candidate WHERE can_hrEmail IN (${param}) ) m
+            LEFT JOIN  interview t ON m.can_id = t.can_id
+        WHERE
+            view_id IS NOT NULL
+            ) x
+            JOIN feedback f ON x.view_id = f.view_id
+        WHERE
+            back_result != 2
+    </select>
+
+    <select id="getPassedInterViewNumByDept" resultType="int" parameterType="string">
+        	SELECT
+                count( * )
+            FROM
+                (
+            SELECT
+                view_id
+            FROM
+                ( SELECT can_id FROM candidate WHERE can_hrEmail IN (${param})) m
+                LEFT JOIN  interview t ON m.can_id = t.can_id
+            WHERE
+                view_id IS NOT NULL
+                ) x
+                JOIN feedback f ON x.view_id = f.view_id
+            WHERE
+                back_result = 0
+    </select>
+
+    <select id="getTalkResultNumByDept" resultType="int" parameterType="string">
+         SELECT
+            count( * )
+        FROM
+            ( SELECT can_id FROM candidate WHERE can_hrEmail IN (${param}) ) m
+            LEFT JOIN ( SELECT * FROM talks WHERE talks_result = 0 ) t ON m.can_id = t.can_id
+        WHERE
+            talks_id IS NOT NULL
+    </select>
+
+<select id="getJobNumByDept" resultType="int" parameterType="string">
+        	SELECT
+                count( * )
+            FROM
+                staff
+            WHERE
+                staff_state = 0
+                AND talks_id IN (
+            SELECT
+                talks_id
+            FROM
+                ( SELECT can_id FROM candidate WHERE can_hrEmail IN (${param}) ) m
+                LEFT JOIN ( SELECT * FROM talks WHERE talks_result = 0 ) t ON m.can_id = t.can_id
+            WHERE
+                talks_id IS NOT NULL
+                )
+    </select>
+
+    <select id="getProNameInfo" resultType="com.rayootech.bean.Vo.echartsVo.ProInfoVo">
+        SELECT can_proName as proName  ,count(*) as interNum FROM candidate GROUP BY can_proName
+    </select>
+
+    <select id="getArgeeNumByDli" resultType="int" parameterType="int">
+        SELECT
+          count( * )
+        FROM
+            ( SELECT can_id FROM candidate WHERE can_dept = ( SELECT org_name FROM org WHERE org_id =  #{deptId}  ) ) m
+            LEFT JOIN ( SELECT * FROM resumecheck WHERE check_state = 0 ) t ON m.can_id = t.can_id
+        WHERE
+            check_id IS NOT NULL
+    </select>
+    <select id="getInterViewNumByDli" resultType="int" parameterType="int">
+        SELECT
+            count( * )
+        FROM
+            ( SELECT can_id FROM candidate WHERE can_dept = ( SELECT org_name FROM org WHERE org_id =  #{deptId}  ) ) m
+            LEFT JOIN interview t ON m.can_id = t.can_id
+        WHERE
+            view_id IS NOT NULL
+    </select>
+    <select id="getJoinInterNumByDli" resultType="int" parameterType="int">
+        SELECT
+            count( * )
+        FROM
+            (
+        SELECT
+            view_id
+        FROM
+            ( SELECT can_id FROM candidate WHERE can_dept = ( SELECT org_name FROM org WHERE org_id =  #{deptId}  ) ) m
+            LEFT JOIN  interview t ON m.can_id = t.can_id
+        WHERE
+            view_id IS NOT NULL
+            ) x
+            JOIN feedback f ON x.view_id = f.view_id
+        WHERE
+            back_result != 2
+    </select>
+    <select id="getPassedInterViewNumByDli" resultType="int" parameterType="int">
+        	SELECT
+                count( * )
+            FROM
+                (
+            SELECT
+                view_id
+            FROM
+                ( SELECT can_id FROM candidate WHERE can_dept = ( SELECT org_name FROM org WHERE org_id =  #{deptId}  ) ) m
+                LEFT JOIN  interview t ON m.can_id = t.can_id
+            WHERE
+                view_id IS NOT NULL
+                ) x
+                JOIN feedback f ON x.view_id = f.view_id
+            WHERE
+                back_result = 0
+    </select>
+    <select id="getTalkResultNumByDli" resultType="int" parameterType="int">
+        SELECT
+            count( * )
+        FROM
+            ( SELECT can_id FROM candidate WHERE can_dept = ( SELECT org_name FROM org WHERE org_id =  #{deptId}  ) ) m
+            LEFT JOIN ( SELECT * FROM talks WHERE talks_result = 0 ) t ON m.can_id = t.can_id
+        WHERE
+            talks_id IS NOT NULL
+    </select>
+    <select id="getJobNumByDli" resultType="int" parameterType="int">
+        	SELECT
+                count( * )
+            FROM
+                staff
+            WHERE
+                staff_state = 0
+                AND talks_id IN (
+            SELECT
+                talks_id
+            FROM
+                ( SELECT can_id FROM candidate WHERE can_dept = ( SELECT org_name FROM org WHERE org_id = #{deptId} ) ) m
+                LEFT JOIN ( SELECT * FROM talks WHERE talks_result = 0 ) t ON m.can_id = t.can_id
+            WHERE
+                talks_id IS NOT NULL
+	)
+    </select>
+
+
+
+
+
+
+
+</mapper>

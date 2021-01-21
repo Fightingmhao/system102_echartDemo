@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.UserDtoMapper">
+    <resultMap id="BaseResultMap" type="com.rayootech.bean.UserDto">
+        <id column="user_id" jdbcType="BIGINT" property="userId" />
+        <result column="dept_id" jdbcType="BIGINT" property="deptId" />
+        <result column="user_name" jdbcType="VARCHAR" property="userName" />
+        <result column="password" jdbcType="VARCHAR" property="password" />
+        <result column="nick_name" jdbcType="VARCHAR" property="nickName" />
+        <result column="status" jdbcType="CHAR" property="status" />
+        <result column="father_id" jdbcType="BIGINT" property="fatherId" />
+        <result column="post_id" jdbcType="BIGINT" property="postId" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+    <sql id="Base_Column_List">
+    user_id, dept_id, user_name, password, nick_name, status, father_id, post_id, create_time
+  </sql>
+
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user
+        where user_id = #{userId,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByFatherId" parameterType="long" resultType="int">
+        select count(*)
+        from user
+        where father_id = #{fatherId,jdbcType=BIGINT}
+    </select>
+
+
+
+    <delete id="deleteByPrimaryKey" parameterType="long">
+        delete  from user where user_id in
+        <foreach collection="array" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="userId" parameterType="com.rayootech.bean.UserDto">
+    insert into user (user_id, dept_id, user_name, password, nick_name, status, father_id, post_id,create_time)
+    values (#{userId,jdbcType=BIGINT}, #{deptId,jdbcType=BIGINT}, #{userName,jdbcType=VARCHAR},
+       #{password,jdbcType=VARCHAR}, #{nickName,jdbcType=VARCHAR}, #{status,jdbcType=CHAR},
+       #{fatherId,jdbcType=BIGINT},#{postId,jdbcType=BIGINT},#{createTime})
+  </insert>
+    <insert id="insertSelective" parameterType="com.rayootech.bean.UserDto">
+        insert into user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="deptId != null">
+                dept_id,
+            </if>
+            <if test="userName != null">
+                user_name,
+            </if>
+
+            <if test="password != null">
+                password,
+            </if>
+            <if test="nickName != null">
+                nick_name,
+            </if>
+
+            <if test="status != null">
+                status,
+            </if>
+            <if test="loginIp != null">
+                login_ip,
+            </if>
+            <if test="loginDate != null">
+                login_date,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="deptId != null">
+                #{deptId,jdbcType=BIGINT},
+            </if>
+            <if test="userName != null">
+                #{userName,jdbcType=VARCHAR},
+            </if>
+
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+
+            <if test="nickName != null">
+                #{nickName,jdbcType=VARCHAR},
+            </if>
+
+            <if test="status != null">
+                #{status,jdbcType=CHAR},
+            </if>
+            <if test="loginIp != null">
+                #{loginIp,jdbcType=VARCHAR},
+            </if>
+            <if test="loginDate != null">
+                #{loginDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.rayootech.bean.UserDto">
+        update user
+        <set>
+            <if test="deptId != null">
+                dept_id = #{deptId,jdbcType=BIGINT},
+            </if>
+            <if test="userName != null">
+                user_name = #{userName,jdbcType=VARCHAR},
+            </if>
+
+            <if test="password != null">
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+
+            <if test="nickName != null">
+                nick_name = #{nickName,jdbcType=VARCHAR},
+            </if>
+
+            <if test="status != null">
+                status = #{status,jdbcType=CHAR},
+            </if>
+            <if test="loginIp != null">
+                login_ip = #{loginIp,jdbcType=VARCHAR},
+            </if>
+            <if test="loginDate != null">
+                login_date = #{loginDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where user_id = #{userId,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.rayootech.bean.UserDto">
+    update user
+    set dept_id = #{deptId,jdbcType=BIGINT},
+      user_name = #{userName,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      nick_name = #{nickName,jdbcType=VARCHAR},
+      status = #{status,jdbcType=CHAR},
+      login_ip = #{loginIp,jdbcType=VARCHAR},
+      login_date = #{loginDate,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where user_id = #{userId,jdbcType=BIGINT}
+  </update>
+
+
+    <select id="getUserByUsername" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user
+        where user_name = #{userName,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getUserByUserId" parameterType="long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user
+        where user_id = #{userId,jdbcType=VARCHAR}
+    </select>
+
+
+
+    <select id="getAllUserList"  resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user
+    </select>
+
+    <select id="getUserListByParams" parameterType="com.rayootech.form.QueryParamsForm"  resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user
+        where 1 = 1
+        <if test="userName != null and userName != ''">and user_name = #{userName}</if>
+        <if test="postId != null and postId != ''">and dept_id in (SELECT o.org_id FROM org o WHERE find_in_set(#{postId}, ancestors))
+            OR post_id IN ( SELECT o.org_id FROM org o WHERE find_in_set(#{postId}, ancestors) )
+            OR dept_id = #{postId} OR post_id = #{postId}</if>
+        order by user_id desc
+    </select>
+
+    <update id="updateUser" parameterType="com.rayootech.bean.UserDto">
+        update user
+        <set>
+            <if test="deptId != null and deptId != 0">dept_id = #{deptId},</if>
+            <if test="userName != null and userName != ''">user_name = #{userName},</if>
+            <if test="password != null and password != ''">password = #{password},</if>
+            <if test="nickName != null and nickName != ''">nick_name = #{nickName},</if>
+            father_id = #{fatherId},
+            <if test="deptId != null and deptId != ''">dept_id = #{deptId},</if>
+            <if test="postId != null and postId != ''">post_id = #{postId},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </set>
+        where user_id = #{userId}
+    </update>
+
+
+    <update id="resetUserPwd" parameterType="com.rayootech.bean.UserDto">
+ 		update user set password = #{password} where user_name = #{userName}
+	</update>
+
+    <select id="selectDeptNameByUserName" parameterType="string" resultType="string">
+        SELECT
+            org_name
+        FROM
+            org
+        JOIN (
+            SELECT
+                dept_id,
+                user_name
+            FROM
+                user
+            WHERE
+                user_name = #{userName}
+        ) u ON u.dept_id = org.org_id
+    </select>
+
+    <select id="selectNameByUserName" parameterType="string" resultType="string">
+        SELECT nick_name FROM `user` WHERE user_name = #{userName}
+    </select>
+
+    <select id="selectPostByUserName" parameterType="string" resultType="string">
+        SELECT
+            org_name
+        FROM
+            org
+        JOIN (
+            SELECT
+                post_id,
+                user_name
+            FROM
+                user
+            WHERE
+                user_name = #{userName}
+        ) u ON org.org_id = u.post_id
+    </select>
+
+    <select id="selectStaffByName" parameterType="string" resultType="string">
+        SELECT
+            nick_name
+        FROM
+            user
+        WHERE
+            father_id = (
+                SELECT
+                    user_id
+                FROM
+                    `user`
+                WHERE
+                    user_name = #{userName}
+            )
+    </select>
+
+    <select id="getDataScope" resultType="string" parameterType="string">
+        SELECT
+        r.data_scope
+        FROM
+        role r
+        RIGHT JOIN (
+        SELECT
+        ur.user_id,
+        ur.role_id
+        FROM
+        `user` u
+        LEFT JOIN user_role ur ON u.user_id = ur.user_id
+        WHERE
+        u.user_name = #{canHremail}
+        ) m ON r.role_id = m.role_id
+        ORDER BY
+        r.data_scope
+    </select>
+
+    <select id="getUserDataScope" resultType="string">
+        SELECT
+        user_name
+        FROM
+        user
+        WHERE
+        post_id IN ( SELECT org_id FROM org WHERE find_in_set( ( SELECT dept_id FROM user WHERE user_name = #{canHremail} LIMIT 1 ), ancestors ) )
+    </select>
+
+    <select id="getDeptype" resultType="string" parameterType="string">
+        SELECT is_deliver FROM org WHERE org_id = ( SELECT dept_id FROM `user` WHERE user_name = #{param} )
+    </select>
+
+    <select id="getDeptypeByID" resultType="string" parameterType="int">
+        SELECT is_deliver FROM org WHERE org_id = #{deptId}
+    </select>
+
+    <select id="getHRByGroup" resultType="string" parameterType="string">
+    SELECT user_name FROM `user` WHERE dept_id = (
+SELECT org_id from org where org_name = #{uName})
+</select>
+
+    <select id="getName" resultMap="BaseResultMap" parameterType="string">
+        SELECT * from `user` WHERE user_name in (${uName})
+    </select>
+
+    <select id="getGroup" parameterType="string" resultType="string">
+        SELECT org_name FROM org where parent_id = (
+SELECT dept_id FROM `user` WHERE user_name = #{uName}) and org_type = "D"
+    </select>
+
+    <select id="getUName" resultMap="BaseResultMap" parameterType="string">
+        SELECT * FROM `user` WHERE dept_id = (
+SELECT org_id FROM org WHERE org_name = #{groupName})
+    </select>
+
+    <select id="getproGroup" parameterType="string" resultType="string">
+        SELECT
+   org_name
+FROM
+   org
+WHERE
+   org_id IN ( SELECT dept_id FROM `user` WHERE user_name IN ( SELECT rec_hrEmail FROM recdata WHERE rec_proName = #{recProName} ) )
+    </select>
+</mapper>

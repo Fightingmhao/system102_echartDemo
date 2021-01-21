@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.deliver.RequirementMapper">
+
+    <resultMap type="Requirement" id="RequirementResult">
+        <result property="reqId" column="req_id"/>
+        <result property="reqDept" column="req_dept"/>
+        <result property="reqPost" column="req_post"/>
+        <result property="reqCount" column="req_count"/>
+        <result property="reqTech" column="req_tech"/>
+        <result property="reqDuty" column="req_duty"/>
+        <result property="reqJobadress" column="req_jobAdress"/>
+        <result property="reqViewadress" column="req_viewAdress"/>
+        <result property="reqWorkyear" column="req_workYear"/>
+        <result property="reqOfferlow" column="req_offerLow"/>
+        <result property="reqOfferhigh" column="req_offerHigh"/>
+        <result property="reqSalarylow" column="req_salaryLow"/>
+        <result property="reqSalaryhigh" column="req_salaryHigh"/>
+        <result property="reqState" column="req_state"/>
+        <result property="reqPubState" column="req_pubState"/>
+        <result property="reqCreatetime" column="req_createTime"/>
+        <result property="reqIp" column="req_ip"/>
+        <result property="proId" column="pro_id"/>
+    </resultMap>
+
+    <resultMap type="com.rayootech.bean.Vo.RequirementPubVo" id="RequirementPubVoResult">
+        <result property="reqId" column="req_id"/>
+        <result property="reqDept" column="req_dept"/>
+        <result property="reqPost" column="req_post"/>
+        <result property="reqCount" column="req_count"/>
+        <result property="reqTech" column="req_tech"/>
+        <result property="reqDuty" column="req_duty"/>
+        <result property="reqJobadress" column="req_jobAdress"/>
+        <result property="reqViewadress" column="req_viewAdress"/>
+        <result property="reqWorkyear" column="req_workYear"/>
+        <result property="reqOfferlow" column="req_offerLow"/>
+        <result property="reqOfferhigh" column="req_offerHigh"/>
+        <result property="reqSalarylow" column="req_salaryLow"/>
+        <result property="reqSalaryhigh" column="req_salaryHigh"/>
+        <result property="reqState" column="req_state"/>
+        <result property="reqCreatetime" column="req_createTime"/>
+        <result property="reqIp" column="req_ip"/>
+        <result property="proName" column="pro_name"/>
+    </resultMap>
+
+    <!--添加需求发布信息-->
+    <insert id="insertRequirement" parameterType="Requirement" useGeneratedKeys="true" keyProperty="reqId">
+        insert into requirement
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="reqDept != null and reqDept != ''">req_dept,</if>
+            <if test="reqPost != null and reqPost != ''">req_post,</if>
+            <if test="reqCount != null">req_count,</if>
+            <if test="reqTech != null and reqTech != ''">req_tech,</if>
+            <if test="reqWorkyear != null">req_workYear,</if>
+            <if test="reqDuty != null and reqDuty != ''">req_duty,</if>
+            <if test="reqJobadress != null and reqJobadress != ''">req_jobAdress,</if>
+            <if test="reqViewadress != null and reqViewadress != ''">req_viewAdress,</if>
+            <if test="reqOfferlow != null">req_offerLow,</if>
+            <if test="reqOfferhigh != null">req_offerHigh,</if>
+            <if test="reqSalarylow != null">req_salaryLow,</if>
+            <if test="reqSalaryhigh != null">req_salaryHigh,</if>
+            <if test="reqPubState != null">req_pubState,</if>
+            <if test="reqState != null">req_state,</if>
+            <if test="reqCreatetime != null">req_createTime,</if>
+            <if test="reqIp != null and reqIp != ''">req_ip,</if>
+            <if test="proId != null">pro_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="reqDept != null and reqDept != ''">#{reqDept},</if>
+            <if test="reqPost != null and reqPost != ''">#{reqPost},</if>
+            <if test="reqCount != null">#{reqCount},</if>
+            <if test="reqTech != null and reqTech != ''">#{reqTech},</if>
+            <if test="reqWorkyear != null">#{reqWorkyear},</if>
+            <if test="reqDuty != null and reqDuty != ''">#{reqDuty},</if>
+            <if test="reqJobadress != null and reqJobadress != ''">#{reqJobadress},</if>
+            <if test="reqViewadress != null and reqViewadress != ''">#{reqViewadress},</if>
+            <if test="reqOfferlow != null">#{reqOfferlow},</if>
+            <if test="reqOfferhigh != null">#{reqOfferhigh},</if>
+            <if test="reqSalarylow != null">#{reqSalarylow},</if>
+            <if test="reqSalaryhigh != null">#{reqSalaryhigh},</if>
+            <if test="reqPubState != null">#{reqPubState},</if>
+            <if test="reqState != null">#{reqState},</if>
+            <if test="reqCreatetime != null">#{reqCreatetime},</if>
+            <if test="reqIp != null and reqIp != ''">#{reqIp},</if>
+            <if test="proId != null">#{proId},</if>
+        </trim>
+    </insert>
+
+    <!--通过部门名称查询需求信息-->
+    <select id="selectRequirementPubVoList" parameterType="string" resultMap="RequirementPubVoResult">
+        SELECT
+            p.pro_name,
+            s.req_id,
+            s.req_dept,
+            s.req_post,
+            s.req_count,
+            s.req_tech,
+            s.req_workYear,
+            s.req_duty,
+            s.req_jobAdress,
+            s.req_viewAdress,
+            s.req_offerLow,
+            s.req_offerHigh,
+            s.req_salaryLow,
+            s.req_salaryHigh,
+            s.req_state,
+            s.req_createTime,
+            s.req_ip
+        FROM
+            project p
+        JOIN (
+            SELECT
+                *
+            FROM
+                requirement
+                <where>
+                    <if test="reqDept != null and reqDept != '' ">
+                        req_dept = #{reqDept}
+                    </if>
+                </where>
+        ) s ON p.pro_id = s.pro_id
+    </select>
+
+    <select id="selectRequirementPubVoById" parameterType="integer" resultMap="RequirementPubVoResult">
+        SELECT
+            p.pro_name,
+            s.req_id,
+            s.req_dept,
+            s.req_post,
+            s.req_count,
+            s.req_tech,
+            s.req_workYear,
+            s.req_duty,
+            s.req_jobAdress,
+            s.req_viewAdress,
+            s.req_offerLow,
+            s.req_offerHigh,
+            s.req_salaryLow,
+            s.req_salaryHigh,
+            s.req_state,
+            s.req_createTime,
+            s.req_ip
+        FROM
+            project p
+        JOIN (
+            SELECT
+                *
+            FROM
+                requirement
+            WHERE
+                req_id = #{reqId}
+        ) s ON p.pro_id = s.pro_id
+    </select>
+
+    <update id="updateRequirement" parameterType="com.rayootech.bean.Vo.RequirementPubVo">
+        UPDATE requirement
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="reqDept != null and reqDept != ''">req_dept = #{reqDept},</if>
+            <if test="reqPost != null and reqPost != ''">req_post = #{reqPost},</if>
+            <if test="reqCount != null">req_count = #{reqCount},</if>
+            <if test="reqTech != null and reqTech != ''">req_tech = #{reqTech},</if>
+            <if test="reqWorkyear != null">req_workYear = #{reqWorkyear},</if>
+            <if test="reqDuty != null and reqDuty != ''">req_duty = #{reqDuty},</if>
+            <if test="reqJobadress != null and reqJobadress != ''">req_jobAdress = #{reqJobadress},</if>
+            <if test="reqViewadress != null and reqViewadress != ''">req_viewAdress = #{reqViewadress},</if>
+            <if test="reqOfferlow != null">req_offerLow = #{reqOfferlow},</if>
+            <if test="reqOfferhigh != null">req_offerHigh = #{reqOfferhigh},</if>
+            <if test="reqSalarylow != null">req_salaryLow = #{reqSalarylow},</if>
+            <if test="reqSalaryhigh != null">req_salaryHigh = #{reqSalaryhigh},</if>
+            <if test="reqState != null">req_state = #{reqState},</if>
+        </trim>
+        WHERE req_id = #{reqId}
+    </update>
+
+    <!--某部门通过项目名称查询需求发布信息-->
+    <select id="selectRequirementPubVoListByProName" parameterType="com.rayootech.bean.Vo.RequirementPubVo" resultMap="RequirementPubVoResult">
+      SELECT
+        p.pro_name,
+        s.req_id,
+        s.req_dept,
+        s.req_post,
+        s.req_count,
+        s.req_tech,
+        s.req_workYear,
+        s.req_duty,
+        s.req_jobAdress,
+        s.req_viewAdress,
+        s.req_offerLow,
+        s.req_offerHigh,
+        s.req_salaryLow,
+        s.req_salaryHigh,
+        s.req_state,
+        s.req_createTime,
+        s.req_ip
+      FROM
+        project p
+      JOIN (
+        SELECT
+            *
+        FROM
+            requirement
+        WHERE
+            req_dept = #{reqDept}
+        AND pro_id = (
+            SELECT
+                pro_id
+            FROM
+                project
+            WHERE
+                pro_name = #{proName}
+        )
+      ) s
+      WHERE
+        p.pro_id = s.pro_id
+    </select>
+
+    <!-- 查询所有的部门名称-->
+    <select id="selectReqDept" resultType="string">
+      SELECT DISTINCT req_dept FROM requirement
+    </select>
+
+    <resultMap id="RequirementSearchVoResult" type="com.rayootech.bean.Vo.RequirementSearchVo">
+        <result property="saleCusname" column="sale_cusName"/>
+        <result property="reqId" column="req_id"/>
+        <result property="reqDept" column="req_dept"/>
+        <result property="reqPost" column="req_post"/>
+        <result property="reqCount" column="req_count"/>
+        <result property="reqTech" column="req_tech"/>
+        <result property="reqDuty" column="req_duty"/>
+        <result property="reqJobadress" column="req_jobAdress"/>
+        <result property="proName" column="pro_name"/>
+        <result property="proType" column="pro_type"/>
+        <result property="proPeriod" column="pro_period"/>
+        <result property="proScale" column="pro_scale"/>
+        <result property="proRelegation" column="pro_relegation"/>
+        <result property="proCusground" column="pro_cusground"/>
+        <result property="proViewgress" column="pro_viewgress"/>
+        <result property="reqViewadress" column="req_viewAdress"/>
+        <result property="reqWorkyear" column="req_workYear"/>
+        <result property="reqOfferlow" column="req_offerLow"/>
+        <result property="reqOfferhigh" column="req_offerHigh"/>
+        <result property="reqSalarylow" column="req_salaryLow"/>
+        <result property="reqSalaryhigh" column="req_salaryHigh"/>
+        <result property="reqState" column="req_state"/>
+        <result property="reqCreatetime" column="req_createTime"/>
+    </resultMap>
+
+    <!-- 查看需求信息-->
+    <select id="selectRequirementAll" parameterType="com.rayootech.bean.Vo.RequirementSearchVo" resultMap="RequirementSearchVoResult">
+        SELECT
+            m.sale_cusName,
+            m.pro_name,
+            m.pro_type,
+            m.pro_period,
+            m.pro_scale,
+            m.pro_relegation,
+            m.pro_cusground,
+            m.pro_viewgress,
+            m.req_id,
+            m.req_dept,
+            m.req_post,
+            m.req_count,
+            m.req_tech,
+            m.req_workYear,
+            m.req_duty,
+            m.req_jobAdress,
+            m.req_viewAdress,
+            m.req_offerLow,
+            m.req_offerHigh,
+            m.req_salaryLow,
+            m.req_salaryHigh,
+            m.req_state,
+            m.req_createTime
+            FROM
+            (
+            SELECT
+            k.*, sale.sale_cusName
+            FROM
+            sale
+            JOIN (
+            SELECT
+            p.pro_cusCode,
+            p.pro_name,
+            p.pro_type,
+            p.pro_period,
+            p.pro_scale,
+            p.pro_relegation,
+            p.pro_cusground,
+            p.pro_viewgress,
+            s.req_id,
+            s.req_dept,
+            s.req_post,
+            s.req_count,
+            s.req_tech,
+            s.req_workYear,
+            s.req_duty,
+            s.req_jobAdress,
+            s.req_viewAdress,
+            s.req_offerLow,
+            s.req_offerHigh,
+            s.req_salaryLow,
+            s.req_salaryHigh,
+            s.req_state,
+            s.req_createTime
+            FROM
+            project p
+            JOIN (SELECT * FROM requirement) s ON p.pro_id = s.pro_id
+            ) k ON sale_cusCode = k.pro_cusCode
+            ) m
+        <where>
+            <if test="proName != null  and proName != ''"> AND m.pro_name = #{proName}</if>
+            <if test="reqPost != null and reqPost != ''"> AND m.req_post = #{reqPost} </if>
+            <if test="reqDept != null and reqDept != ''"> AND m.req_dept = #{reqDept}</if>
+            <if test="reqCreatetime != null"> AND TO_DAYS(m.req_createTime) = TO_DAYS((#{reqCreatetime}))</if>
+        </where>
+    </select>
+
+    <select id="selectRequirementSearchVoById" parameterType="int" resultMap="RequirementSearchVoResult">
+        SELECT
+            m.sale_cusName,
+            m.pro_name,
+            m.pro_type,
+            m.pro_period,
+            m.pro_scale,
+            m.pro_relegation,
+            m.pro_cusground,
+            m.pro_viewgress,
+            m.req_id,
+            m.req_dept,
+            m.req_post,
+            m.req_count,
+            m.req_tech,
+            m.req_workYear,
+            m.req_duty,
+            m.req_jobAdress,
+            m.req_viewAdress,
+            m.req_offerLow,
+            m.req_offerHigh,
+            m.req_salaryLow,
+            m.req_salaryHigh,
+            m.req_state,
+            m.req_createTime
+        FROM
+            (
+                SELECT
+                    k.*, sale.sale_cusName
+                FROM
+                    sale
+                JOIN (
+                    SELECT
+                        p.pro_cusCode,
+                        p.pro_name,
+                        p.pro_type,
+                        p.pro_period,
+                        p.pro_scale,
+                        p.pro_relegation,
+                        p.pro_cusground,
+                        p.pro_viewgress,
+                        s.req_id,
+                        s.req_dept,
+                        s.req_post,
+                        s.req_count,
+                        s.req_tech,
+                        s.req_workYear,
+                        s.req_duty,
+                        s.req_jobAdress,
+                        s.req_viewAdress,
+                        s.req_offerLow,
+                        s.req_offerHigh,
+                        s.req_salaryLow,
+                        s.req_salaryHigh,
+                        s.req_state,
+                        s.req_createTime
+                    FROM
+                        project p
+                    JOIN (SELECT * FROM requirement) s ON p.pro_id = s.pro_id
+                ) k ON sale_cusCode = k.pro_cusCode
+            ) m
+        WHERE
+            m.req_id = #{reqId}
+    </select>
+
+
+
+    <select id="selectSaleRequirementPubVoList" parameterType="string" resultMap="RequirementPubVoResult">
+        SELECT
+        p.pro_name,
+        s.req_id,
+        s.req_dept,
+        s.req_post,
+        s.req_count,
+        s.req_tech,
+        s.req_workYear,
+        s.req_duty,
+        s.req_jobAdress,
+        s.req_viewAdress,
+        s.req_offerLow,
+        s.req_offerHigh,
+        s.req_salaryLow,
+        s.req_salaryHigh,
+        s.req_state,
+        s.req_createTime,
+        s.req_ip
+        FROM
+        (
+        SELECT
+        *
+        FROM
+        project m
+        RIGHT JOIN ( SELECT sale_cusCode, sale_cusName, sale_name FROM sale WHERE sale_code IN ( ${param} ) ) t ON m.pro_cusCode = t.sale_cusCode
+        WHERE
+        pro_cusCode IS NOT NULL
+        ) p
+        JOIN requirement s ON p.pro_id = s.pro_id
+    </select>
+
+
+
+
+</mapper>

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.recruitment.ViewMapper">
+
+    <resultMap type="View" id="ViewResult">
+        <result property="viewId"    column="view_id"    />
+        <result property="canId"    column="can_id"    />
+        <result property="viewName"    column="view_name"    />
+        <result property="viewTime"    column="view_time"    />
+        <result property="viewCreatetime"    column="view_createTime"    />
+        <result property="viewIp"    column="view_ip"    />
+        <result property="viewState"    column="view_state"    />
+        <result property="deptId"    column="dept_id"    />
+    </resultMap>
+
+
+
+    <resultMap type="com.rayootech.bean.Vo.InterviewVo" id="viewVoResult">
+        <result property="canId"    column="can_id"    />
+        <result property="checkState"    column="check_state"    />
+        <result property="checkName"    column="check_name"    />
+        <result property="canProName"    column="can_proName"    />
+        <result property="canDept" column="can_dept" />
+        <result property="canName"    column="can_name"    />
+        <result property="canSex"    column="can_sex"    />
+        <result property="canPhone"    column="can_phone"    />
+        <result property="canPost"    column="can_post"    />
+        <result property="canHrname"    column="can_hrName"    />
+        <result property="canHremail"    column="can_hrEmail"    />
+        <result property="canResumecopy"    column="can_resumeCopy"    />
+        <result property="canText"    column="can_text"    />
+        <result property="viewTime"    column="view_time"    />
+        <result property="viewState"    column="view_state"    />
+    </resultMap>
+
+    <resultMap id="ViewResultVo" type="com.rayootech.bean.Vo.ViewResultVo">
+        <result property="canId"    column="can_id"    />
+        <result property="viewName"    column="view_name"    />
+        <result property="viewTime"    column="view_time"    />
+        <result property="viewCreatetime"    column="view_createTime"    />
+        <result property="viewIp"    column="view_ip"    />
+        <result property="viewState"    column="view_state"    />
+        <result property="canId"    column="can_id"    />
+        <result property="canProName"    column="can_proName"    />
+        <result property="canDept" column="can_dept" />
+        <result property="canSex"    column="can_sex"    />
+        <result property="canPost"    column="can_post"    />
+        <result property="canHrname"    column="can_hrName"    />
+        <result property="canHremail"    column="can_hrEmail"    />
+        <result property="canResstate"    column="can_resState"    />
+        <result property="canResumecopy"    column="can_resumeCopy"    />
+        <result property="canText"    column="can_text"    />
+    </resultMap>
+
+    <insert id="insertView" parameterType="View" useGeneratedKeys="true" keyProperty="viewId">
+        insert into interview
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="canId != null">can_id,</if>
+            <if test="viewName != null">view_name,</if>
+            <if test="viewTime != null">view_time,</if>
+            <if test="viewCreatetime != null">view_createTime,</if>
+            <if test="viewIp != null">view_ip,</if>
+            <if test="viewState != null">view_state,</if>
+            <if test="deptId != null">dept_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="canId != null">#{canId},</if>
+            <if test="viewName != null">#{viewName},</if>
+            <if test="viewTime != null">#{viewTime},</if>
+            <if test="viewCreatetime != null">#{viewCreatetime},</if>
+            <if test="viewIp != null">#{viewIp},</if>
+            <if test="viewState != null">#{viewState},</if>
+            <if test="deptId != null">#{deptId},</if>
+        </trim>
+    </insert>
+
+    <select id="selectViewByCanId" parameterType="integer" resultMap="ViewResult">
+        SELECT * FROM interview WHERE can_id = #{canId}
+    </select>
+
+    <select id="selectViewIdByCanId" parameterType="integer" resultType="integer">
+        SELECT view_id FROM interview WHERE can_id = #{canId}
+    </select>
+
+    <!--查询需要预约面试的候选人-->
+    <select id="selectViewer" parameterType="com.rayootech.bean.Vo.InterviewVo" resultMap="viewVoResult">
+        SELECT
+        n.can_post,
+        n.can_id,
+        n.can_proName,
+        n.can_dept,
+        n.can_hrName,
+        n.can_text,
+        n.check_name,
+        n.can_name,
+        n.can_sex,
+        n.can_phone,
+        n.check_state,
+        n.can_hrEmail
+        FROM
+        (
+        SELECT
+        c.can_id,
+        can_proName,
+        can_dept,
+        can_hrName,
+        can_text,
+        check_name,
+        can_name,
+        can_sex,
+        can_phone,
+        can_post,
+        check_state,
+        can_hrEmail
+        FROM
+        candidate c
+        JOIN ( SELECT * FROM resumecheck WHERE check_state = 0 ) r ON c.can_id = r.can_id
+        <where>
+            <if test="canHremail != null and canHremail != ''">
+                can_hrEmail in (${canHremail})
+            </if>
+        </where>
+        ) n
+        LEFT JOIN interview i ON i.can_id = n.can_id
+        WHERE
+        i.view_time IS NULL
+        <if test="canDept != null and canDept != ''">AND n.can_dept = #{canDept}</if>
+        <if test="canProName != null and canProName != '' ">AND n.can_proName = #{canProName} </if>
+        <if test="canName != null and canName != ''">AND n.can_name = #{canName}</if>
+    </select>
+
+    <!--查询面试信息-->
+    <select id="selectViewResult" parameterType="com.rayootech.bean.Vo.ViewResultVo" resultMap="ViewResultVo">
+        SELECT
+            m.can_id,
+            m.can_proName,
+            m.can_dept,
+            m.can_sex,
+            m.can_phone,
+            m.can_post,
+            m.can_hrName,
+            m.can_hrEmail,
+            m.can_text,
+            m.can_resState,
+            m.view_id,
+            m.view_name,
+            m.view_createTime,
+            m.view_time,
+            m.view_ip,
+            m.view_state
+            FROM
+            (
+            SELECT
+            i.can_id,
+            can_proName,
+            can_dept,
+            can_sex,
+            can_phone,
+            can_post,
+            can_hrName,
+            can_hrEmail,
+            can_text,
+            can_resState,
+            view_id,
+            view_name,
+            view_createTime,
+            view_time,
+            view_ip,
+            view_state
+            FROM
+            candidate c
+            JOIN interview i ON c.can_id = i.can_id
+            ) m
+            LEFT JOIN feedback f ON m.view_id = f.view_id
+            WHERE
+            back_result IS NULL
+            <if test="canHremail != null and canHremail != ''">
+                AND m.can_hrEmail in (${canHremail})
+            </if>
+            <if test="canProName != null and canProName != '' ">AND m.can_proName = #{canProName} </if>
+            <if test="viewName != null and viewName != ''">AND m.view_name = #{viewName}</if>
+            <if test="canHrname != null and canHrname != '' ">AND m.can_hrName = #{canHrname} </if>
+    </select>
+
+    <select id="selectViewResultById" parameterType="int" resultMap="ViewResultVo">
+      SELECT
+            i.can_id,
+            can_proName,
+            can_dept,
+            can_sex,
+            can_phone,
+            can_post,
+            can_hrName,
+            can_hrEmail,
+            can_resState,
+            view_name,
+            view_createTime,
+            view_time,
+            view_ip,
+            view_state
+        FROM
+            candidate c
+        JOIN (SELECT * FROM interview) i ON c.can_id = i.can_id
+        WHERE
+            i.can_id = #{canId}
+    </select>
+
+    <update id="updateView" parameterType="View">
+        update interview
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="viewTime != null">view_time = #{viewTime},</if>
+            <if test="viewState != null and viewState != ''">view_state = #{viewState},</if>
+        </trim>
+        where can_id = #{canId}
+    </update>
+
+
+</mapper>

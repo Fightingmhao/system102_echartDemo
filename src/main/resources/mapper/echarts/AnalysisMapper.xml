@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.echarts.AnalysisMapper">
+
+
+    <resultMap type="AnalysisVo" id="AnalysisVoResult">
+        <result property="saleName"    column="info_saleName"    />
+        <result property="infoSaleCode"    column="info_saleCode"    />
+        <result property="proDept"    column="info_dept"    />
+        <result property="proName"    column="out_proName"    />
+        <result property="infoSalaryTotal"    column="info_salaryTotal"    />
+        <result property="infoCalState"    column="info_calState"    />
+        <result property="outShouldTotal"    column="out_shouldTotal"    />
+        <result property="outCalState"    column="out_calState"    />
+
+    </resultMap>
+
+<select id="getProNameSale" resultType="string" parameterType="string">
+
+    SELECT
+    info_proName
+    FROM
+    ( SELECT DISTINCT QUARTER ( info_date ) AS seasons, info_proName FROM staffinfo
+    <where>
+        <if test="info_saleCode != null and info_saleCode != ''"> and info_saleCode in (${infoSaleCode})</if>
+        <if test="monthTime != null   ">and DATE_FORMAT(info_date , '%Y-%m' ) = DATE_FORMAT(#{monthTime}, '%Y-%m' ) </if>
+        <if test="yearTime != null">and year(info_date)= #{yearTime}</if>
+        <if test="years != null">and year(info_date)= #{years}</if>
+    </where>  ) r
+    <where>
+        <if test="season != null">and seasons = #{season}</if>
+    </where>
+    ORDER BY
+    info_proName
+</select>
+
+
+    <select id="gerProIncome" parameterType="com.rayootech.bean.Vo.echartsVo.AnalysisVo" resultType="double">
+        SELECT
+        sum( out_shouldTotal ) AS outShouldTotal
+        FROM
+        ( SELECT QUARTER ( out_date) AS seasons, out_proName, out_shouldTotal, out_date FROM outsettle
+        <where>
+            <if test="infoSaleCode != null and infoSaleCode != '' ">and out_saleCode in (${infoSaleCode})</if>
+            <if test="monthTime != null   ">and DATE_FORMAT(out_date , '%Y-%m' ) = DATE_FORMAT(#{monthTime}, '%Y-%m' ) </if>
+            <if test="yearTime != null">and year(out_date)= #{yearTime}</if>
+            <if test="years != null">and year(out_date)= #{years}</if>
+        </where>) r
+        <where>
+            <if test="season != null">and seasons = #{season}</if>
+        </where>
+        GROUP BY out_proName ORDER BY out_proName
+
+    </select>
+
+    <select id="getEmpCost" resultType="double" parameterType="com.rayootech.bean.Vo.echartsVo.AnalysisVo">
+        SELECT
+        sum( info_salaryTotal ) AS infoSalaryTotal
+        FROM
+        ( SELECT QUARTER ( info_date ) AS seasons, info_proName, info_salaryTotal, info_date FROM `staffinfo`
+        <where>
+            <if test="infoSaleCode != null and infoSaleCode != '' ">and info_saleCode in (${infoSaleCode})</if>
+            <if test="monthTime != null   ">and DATE_FORMAT(info_date , '%Y-%m' ) = DATE_FORMAT(#{monthTime}, '%Y-%m' ) </if>
+            <if test="yearTime != null">and year(info_date)= #{yearTime}</if>
+            <if test="years != null">and year(info_date)= #{years}</if>
+        </where>) r
+        <where>
+            <if test="season != null">and seasons = #{season}</if>
+        </where>
+        GROUP BY info_proName ORDER BY info_proName
+    </select>
+
+    <!--<select id="delProName" resultType="string" parameterType="com.rayootech.bean.Vo.echartsVo.AnalysisVo">-->
+        <!--SELECT-->
+        <!--info_proName-->
+        <!--FROM-->
+        <!--( SELECT DISTINCT QUARTER ( info_date ) AS seasons, info_proName FROM staffinfo-->
+        <!--<where>-->
+            <!--<if test="dept != null and dept != ''"> and info_dept = #{dept}</if>-->
+            <!--<if test="monthTime != null   ">and DATE_FORMAT(info_date , '%Y-%m' ) = DATE_FORMAT(#{monthTime}, '%Y-%m' ) </if>-->
+            <!--<if test="yearTime != null">and year(info_date)= #{yearTime}</if>-->
+            <!--<if test="years != null">and year(info_date)= #{years}</if>-->
+        <!--</where>  ) r-->
+        <!--<where>-->
+            <!--<if test="season != null">and seasons = #{season}</if>-->
+        <!--</where>-->
+        <!--ORDER BY-->
+        <!--info_proName-->
+        <!---->
+        <!---->
+    <!--</select>-->
+
+
+    <select id="getDeliverIncom" parameterType="com.rayootech.bean.Vo.echartsVo.AnalysisVo" resultMap="AnalysisVoResult">
+        SELECT
+        sum( out_shouldTotal ) AS out_shouldTotal,out_proName
+        FROM
+        ( SELECT QUARTER ( out_date) AS seasons, out_proName, out_shouldTotal, out_date FROM outsettle
+        <where>
+            <if test="proDept != null and proDept != '' ">and out_dept = #{proDept}</if>
+            <if test="monthTime != null   ">and DATE_FORMAT(out_date , '%Y-%m' ) = DATE_FORMAT(#{monthTime}, '%Y-%m' ) </if>
+            <if test="yearTime != null">and year(out_date)= #{yearTime}</if>
+            <if test="years != null">and year(out_date)= #{years}</if>
+        </where>) r
+        <where>
+            <if test="season != null">and seasons = #{season}</if>
+        </where>
+        GROUP BY out_proName ORDER BY out_proName
+    </select>
+
+    <select id="getDeliverCost" resultType="double" parameterType="com.rayootech.bean.Vo.echartsVo.AnalysisVo">
+        SELECT
+        sum( info_salaryTotal ) AS infoSalaryTotal
+        FROM
+        ( SELECT QUARTER ( info_date ) AS seasons, info_proName, info_salaryTotal, info_date FROM `staffinfo`
+        <where>
+            <if test="proDept != null and proDept != '' ">and info_dept = #{proDept}</if>
+            <if test="monthTime != null   ">and DATE_FORMAT(info_date , '%Y-%m' ) = DATE_FORMAT(#{monthTime}, '%Y-%m' ) </if>
+            <if test="yearTime != null">and year(info_date)= #{yearTime}</if>
+            <if test="years != null">and year(info_date)= #{years}</if>
+        </where>) r
+        <where>
+            <if test="season != null">and seasons = #{season}</if>
+        </where>
+        GROUP BY info_proName ORDER BY info_proName
+    </select>
+
+    <select id="getDataDeliverOne" resultType="integer" parameterType="com.rayootech.bean.Vo.echartsVo.AnalysisVo">
+  SELECT  IFNULL(b.count,0) as counts FROM(
+        SELECT  1 as click_date UNION ALL
+        SELECT  2 as click_date UNION ALL
+        SELECT  3 as click_date UNION ALL
+        SELECT  4 as click_date) a LEFT JOIN(
+        SELECT QUARTER(pro_createTime) as season, COUNT(*) as count FROM project
+        <where>
+            <if test="proDept != null and proDept != ''">AND  pro_dept = #{proDept}</if>
+            <if test="yearTime != null "> AND DATE_FORMAT( pro_createTime, '%Y' ) = #{yearTime} </if>
+        </where>
+        GROUP BY QUARTER(pro_createTime))
+        b ON click_date=b.season
+    </select>
+
+    <select id="getDataDeliverTwo" parameterType="com.rayootech.bean.Vo.echartsVo.AnalysisVo" resultMap="AnalysisVoResult">
+
+SELECT
+	a.click_date AS year,
+	ifnull( b.count, 0 ) AS count
+FROM
+	(
+SELECT YEAR
+	( now( ) ) AS click_date UNION ALL
+SELECT YEAR
+	( now( ) ) - 1 AS click_date UNION ALL
+SELECT YEAR
+	( now( ) ) - 2 AS click_date UNION ALL
+SELECT YEAR
+	( now( ) ) - 3 AS click_date UNION ALL
+SELECT YEAR
+	( now( ) ) - 4 AS click_date
+	) a
+	LEFT JOIN (
+SELECT
+	DATE_FORMAT( t.staff_ruTime, '%Y' ) 'date',
+	count( can_name ) 'count'
+FROM
+	candidate
+	RIGHT JOIN (
+SELECT
+	can_id,
+	s.talks_id,
+	s.staff_ruTime
+FROM
+	talks
+	JOIN ( SELECT talks_id, staff_ruTime FROM staff ) s ON s.talks_id = talks.talks_id
+	) t ON t.can_id = candidate.can_id
+	<where>
+        <if test="proDept != null and proDept != ''">and can_dept = #{proDept}</if>
+    </where>
+GROUP BY
+	date
+	) b ON a.click_date = b.date;
+    </select>
+</mapper>

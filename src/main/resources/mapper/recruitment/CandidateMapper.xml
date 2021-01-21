@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.recruitment.CandidateMapper">
+    <resultMap type="Candidate" id="CandidateResult">
+        <result property="canId"    column="can_id"    />
+        <result property="canProName"    column="can_proName"    />
+        <result property="canDept" column="can_dept" />
+        <result property="canName"    column="can_name"    />
+        <result property="canCard" column="can_card"/>
+        <result property="canSex"    column="can_sex"    />
+        <result property="canPhone"    column="can_phone"    />
+        <result property="canPost"    column="can_post"    />
+        <result property="canHrname"    column="can_hrName"    />
+        <result property="canHremail"    column="can_hrEmail"    />
+        <result property="canState"    column="can_state"    />
+        <result property="canResstate"    column="can_resState"    />
+        <result property="canResumecopy"    column="can_resumeCopy"    />
+        <result property="canCreatetime"    column="can_createTime"    />
+        <result property="canIp"    column="can_ip"    />
+        <result property="canText"    column="can_text"    />
+    </resultMap>
+
+    <!--查询未审核候选人信息-->
+    <select id="selectCanInfoByDeptName" parameterType="com.rayootech.bean.Vo.ResumeCheckVo" resultMap="CandidateResult">
+       SELECT
+        c.can_id,
+        c.can_dept,
+        c.can_proName,
+        c.can_name,
+        c.can_sex,
+        c.can_phone,
+        c.can_post,
+        c.can_hrName,
+        c.can_state,
+        c.can_text,
+        c.can_createTime
+        FROM
+            (
+                SELECT
+        can_id,
+        can_proName,
+        can_dept,
+        can_name,
+        can_card,
+        can_sex,
+        can_phone,
+        can_post,
+        can_hrName,
+        can_hrEmail,
+        can_state,
+        can_createTime,
+        can_text
+                FROM
+                    candidate
+                WHERE
+                    can_dept = #{canDept}
+            ) c
+        LEFT JOIN resumecheck r ON c.can_id = r.can_id
+        WHERE
+            r.can_id IS NULL
+            <if test="canProName != null  and canProName != ''">AND c.can_proName = #{canProName}</if>
+            <if test="canHrname != null and canHrname != ''">AND c.can_hrName = #{canHrname} </if>
+            <if test="canCreatetime != null"> AND TO_DAYS(c.can_createTime) = TO_DAYS((#{canCreatetime}))</if>
+    </select>
+
+    <select id="selectCanByDeptName" parameterType="string" resultMap="CandidateResult">
+        SELECT * FROM candidate WHERE can_dept = #{canDept}
+    </select>
+
+    <sql id="selectCandidateVo">
+        select can_id,can_proName, can_dept, can_name, can_card,can_sex, can_phone, can_post, can_hrName, can_hrEmail, can_state, can_resState, can_resumeCopy, can_createTime, can_ip,can_text from candidate
+    </sql>
+
+    <update id="updateCandidateVo" parameterType="Candidate">
+        update candidate
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="canHremail != null and canHremail != ''">can_hrEmail = #{canHremail},</if>
+            <if test="canProName != null">can_proName = #{canProName},</if>
+            <if test="canHrname != null and canHrname != ''">can_hrName = #{canHrname},</if>
+            <if test="canDept != null">can_dept = #{canDept},</if>
+            <if test="canName != null and canName != ''">can_name = #{canName},</if>
+            <if test="canSex != null and canSex != ''">can_sex = #{canSex},</if>
+            <if test="canPhone != null and canPhone != ''">can_phone = #{canPhone},</if>
+            <if test="canPost != null and canPost != ''">can_post = #{canPost},</if>
+            <if test="canState != null">can_state = #{canState},</if>
+            <if test="canCard != null and canCard != ''">can_card = #{canCard},</if>
+--             <if test="canResstate != null">can_resState = #{canResstate},</if>
+            <if test="canResumecopy != null and canResumecopy != ''">can_resumeCopy = #{canResumecopy},</if>
+            <if test="canCreatetime != null">can_createTime = #{canCreatetime},</if>
+            <if test="canIp != null and canIp != ''">can_ip = #{canIp},</if>
+        </trim>
+        where can_id = #{canId}
+    </update>
+
+    <select id="selectViewer" parameterType="String" resultMap="CandidateResult">
+        SELECT * FROM candidate WHERE can_hrEmail = #{canHremail} AND can_resState = 0
+    </select>
+
+    <select id="selectViewerByDeptName" parameterType="string" resultMap="CandidateResult">
+        SELECT * FROM candidate WHERE can_dept = #{deptName} AND can_resState = 0
+    </select>
+
+    <select id="selectCandidateAll" resultMap="CandidateResult">
+        SELECT * FROM candidate
+    </select>
+
+
+    <select id="selectCandidateList" parameterType="Candidate" resultMap="CandidateResult">
+        SELECT
+        can_id,
+        can_proName,
+        can_dept,
+        can_name,
+        can_card,
+        can_sex,
+        can_phone,
+        can_post,
+        can_hrName,
+        can_hrEmail,
+        can_state,
+        can_createTime,
+        can_text
+        FROM
+        candidate
+        <where>
+            <if test="canHremail != null and canHremail != ''">
+                AND can_hrEmail in (${canHremail})
+            </if>
+            <if test="canProName != null and canProName != ''">AND can_proName = #{canProName}</if>
+            <if test="canDept != null and canDept != ''">AND can_dept =  #{canDept}</if>
+            <if test="canName != null and canName != ''">AND can_name = #{canName}</if>
+        </where>
+    </select>
+
+    <select id="selectCandidateById" parameterType="Integer" resultMap="CandidateResult">
+        <include refid="selectCandidateVo"/>
+        where can_id = #{canId}
+    </select>
+
+
+    <insert id="insertCandidate" parameterType="Candidate">
+        insert into candidate
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="canProName != null and canProName != ''">can_proName ,</if>
+            <if test="canDept != null and canDept != ''">can_dept,</if>
+            <if test="canName != null and canName != ''">can_name ,</if>
+            <if test="canCard != null and canCard != ''">can_card ,</if>
+            <if test="canSex != null and canSex != ''">can_sex,</if>
+            <if test="canPhone != null and canPhone != ''">can_phone,</if>
+            <if test="canPost != null and canPost != ''">can_post,</if>
+            <if test="canHrname != null and canHrname != ''">can_hrName,</if>
+            <if test="canHremail != null and canHremail != ''">can_hrEmail,</if>
+            <if test="canState != null">can_state,</if>
+            <if test="canResstate != null">can_resState,</if>
+            <if test="canResumecopy != null and canResumecopy != ''">can_resumeCopy,</if>
+            <if test="canCreatetime != null">can_createTime,</if>
+            <if test="canIp != null and canIp != ''">can_ip,</if>
+            <if test="canText != null and canText != ''">can_text</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+
+            <if test="canProName != null and canProName != ''">#{canProName},</if>
+            <if test="canDept != null and canDept != ''"> #{canDept},</if>
+            <if test="canName != null and canName != ''">#{canName},</if>
+            <if test="canCard != null and canCard != ''">#{canCard} ,</if>
+            <if test="canSex != null and canSex != ''">#{canSex},</if>
+            <if test="canPhone != null and canPhone != ''">#{canPhone},</if>
+            <if test="canPost != null and canPost != ''">#{canPost},</if>
+            <if test="canHrname != null and canHrname != ''">#{canHrname},</if>
+            <if test="canHremail != null and canHremail != ''">#{canHremail},</if>
+            <if test="canState != null">#{canState},</if>
+            <if test="canResstate != null">#{canResstate},</if>
+            <if test="canResumecopy != null and canResumecopy != ''">#{canResumecopy},</if>
+            <if test="canCreatetime != null">#{canCreatetime},</if>
+            <if test="canIp != null and canIp != ''">#{canIp},</if>
+            <if test="canText != null and canText != ''">#{canText}</if>
+        </trim>
+
+    </insert>
+
+    <update id="updateCandidate" parameterType="Candidate">
+        update candidate
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="canProName != null and canProName != ''">can_proName = #{canProName},</if>
+            <if test="canDept != null and canDept != ''">can_dept = #{canDept},</if>
+            <if test="canName != null and canName != ''">can_name = #{canName},</if>
+            <if test="canCard != null and canCard != ''">can_card = #{canCard},</if>
+            <if test="canSex != null and canSex != ''">can_sex = #{canSex},</if>
+            <if test="canPhone != null and canPhone != ''">can_phone = #{canPhone},</if>
+            <if test="canPost != null and canPost != ''">can_post = #{canPost},</if>
+            <if test="canHrname != null and canHrname != ''">can_hrName = #{canHrname},</if>
+            <if test="canHremail != null and canHremail != ''">can_hrEmail = #{canHremail},</if>
+            <if test="canState != null">can_state = #{canState},</if>
+            <if test="canResstate != null">can_resState = #{canResstate},</if>
+            <if test="canResumecopy != null and canResumecopy != ''">can_resumeCopy = #{canResumecopy},</if>
+            <if test="canText != null">can_text = #{canText},</if>
+            <if test="canCreatetime != null">can_createTime = #{canCreatetime},</if>
+            <if test="canIp != null and canIp != ''">can_ip = #{canIp},</if>
+        </trim>
+        where can_id = #{canId}
+    </update>
+
+
+
+    <update id="updateCandidates" parameterType="java.util.List">
+        UPDATE candidate
+        SET can_resState = case
+        <foreach collection="list" item="item" index="index">
+            when  can_id  = #{item.canId} then #{item.canResstate}
+        </foreach>
+        END
+        WHERE
+        can_id IN
+        <foreach collection="list" item="item" separator="," close=")" open="(">
+            #{item.canId,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+    <update id="updateCan" parameterType="com.rayootech.bean.Vo.CanVo">
+        UPDATE candidate
+        SET can_proName = #{newCanProName}
+        WHERE
+            can_proName = #{oldCanProName}
+    </update>
+
+
+    <select id="selectCandidateListBySale" parameterType="Candidate" resultMap="CandidateResult">
+
+        SELECT
+        can_id,
+        can_proName,
+        can_dept,
+        can_name,
+        can_card,
+        can_sex,
+        can_phone,
+        can_post,
+        can_hrName,
+        can_hrEmail,
+        can_state,
+        can_createTime,
+        can_text
+        FROM
+        sale
+        JOIN project ON sale_cusCode = pro_cusCode
+        JOIN candidate ON pro_name = can_proName
+        <where>
+            <if test="canHremail != null and canHremail != ''">
+                AND sale_code in (${canHremail})
+            </if>
+            <if test="canProName != null and canProName != ''">AND can_proName = #{canProName}</if>
+            <if test="canDept != null and canDept != ''">AND can_dept =  #{canDept}</if>
+            <if test="canName != null and canName != ''">AND can_name = #{canName}</if>
+        </where>
+
+    </select>
+
+
+
+</mapper>

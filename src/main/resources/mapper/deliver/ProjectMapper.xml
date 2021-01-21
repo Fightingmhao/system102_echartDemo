@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.deliver.ProjectMapper">
+
+    <resultMap type="Project" id="ProjectResult">
+        <result property="proId" column="pro_id"/>
+        <result property="proDept" column="pro_dept"/>
+        <result property="proCuscode" column="pro_cusCode"/>
+        <result property="proCusState" column="pro_cusState"/>
+        <result property="proCode" column="pro_code"/>
+        <result property="proName" column="pro_name"/>
+        <result property="proState" column="pro_state"/>
+        <result property="proType" column="pro_type"/>
+        <result property="proPeriod" column="pro_period"/>
+        <result property="proScale" column="pro_scale"/>
+        <result property="proRelegation" column="pro_relegation"/>
+        <result property="proCusground" column="pro_cusground"/>
+        <result property="proViewgress" column="pro_viewgress"/>
+        <result property="proCreatetime" column="pro_createTime"/>
+        <result property="proIp" column="pro_ip"/>
+    </resultMap>
+
+    <resultMap type="com.rayootech.bean.Vo.ProjectInfoVo" id="ProjectInfoVo">
+        <result property="proId" column="pro_id"/>
+        <result property="proDept" column="pro_dept"/>
+        <result property="proCode" column="pro_code"/>
+        <result property="proName" column="pro_name"/>
+        <result property="proState" column="pro_state"/>
+        <result property="proType" column="pro_type"/>
+        <result property="proPeriod" column="pro_period"/>
+        <result property="proScale" column="pro_scale"/>
+        <result property="proRelegation" column="pro_relegation"/>
+        <result property="proCusground" column="pro_cusground"/>
+        <result property="proViewgress" column="pro_viewgress"/>
+        <result property="proCreatetime" column="pro_createTime"/>
+        <result property="proIp" column="pro_ip"/>
+        <result property="saleCusname"    column="sale_cusName"    />
+        <result property="saleName"    column="sale_name"    />
+    </resultMap>
+
+
+    <sql id="selectProject">
+        select pro_id, pro_dept, pro_cusCode, pro_cusState, pro_code,pro_name, pro_state, pro_type, pro_period, pro_scale, pro_relegation, pro_cusground, pro_viewgress, pro_createTime, pro_ip from project
+    </sql>
+
+    <!--通过项目名称查询项目ID-->
+    <select id="selectProIdByProName" parameterType="string" resultType="integer">
+        SELECT pro_id FROM project WHERE pro_name = #{proName}
+    </select>
+
+
+    <!-- 插入项目信息 -->
+    <insert id="insertProject" parameterType="Project" useGeneratedKeys="true" keyProperty="proId">
+        insert into project
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="proDept != null and proDept != ''">pro_dept,</if>
+            <if test="proCuscode != null and proCuscode != ''">pro_cusCode,</if>
+            <if test="proCusState != null and proCusState != ''">pro_cusState</if>
+            <if test="proCode != null and proCode != ''">pro_code,</if>
+            <if test="proName != null and proName != ''">pro_name,</if>
+            <if test="proState != null">pro_state,</if>
+            <if test="proType != null and proType != ''">pro_type,</if>
+            <if test="proPeriod != null and proPeriod != ''">pro_period,</if>
+            <if test="proScale != null and proScale != ''">pro_scale,</if>
+            <if test="proRelegation != null and proRelegation != ''">pro_relegation,</if>
+            <if test="proCusground != null and proCusground != ''">pro_cusground,</if>
+            <if test="proViewgress != null and proViewgress != ''">pro_viewgress,</if>
+            <if test="proCreatetime != null">pro_createTime,</if>
+            <if test="proIp != null and proIp != ''">pro_ip,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="proDept != null and proDept != ''">#{proDept},</if>
+            <if test="proCuscode != null and proCuscode != ''">#{proCuscode},</if>
+            <if test="proCusState != null and proState != ''">#{proCusState},</if>
+            <if test="proCode != null and proCode != ''">#{proCode},</if>
+            <if test="proName != null and proName != ''">#{proName},</if>
+            <if test="proState != null">#{proState},</if>
+            <if test="proType != null and proType != ''">#{proType},</if>
+            <if test="proPeriod != null and proPeriod != ''">#{proPeriod},</if>
+            <if test="proScale != null and proScale != ''">#{proScale},</if>
+            <if test="proRelegation != null and proRelegation != ''">#{proRelegation},</if>
+            <if test="proCusground != null and proCusground != ''">#{proCusground},</if>
+            <if test="proViewgress != null and proViewgress != ''">#{proViewgress},</if>
+            <if test="proCreatetime != null">#{proCreatetime},</if>
+            <if test="proIp != null and proIp != ''">#{proIp},</if>
+        </trim>
+    </insert>
+
+    <!--查看项目信息-->
+    <select id="selectProjectInfoVoList" parameterType="com.rayootech.bean.Vo.ProVo" resultMap="ProjectInfoVo">
+        SELECT
+        p.pro_id,
+        p.pro_dept,
+        p.pro_code,
+        p.pro_name,
+        p.pro_state,
+        p.pro_type,
+        p.pro_period,
+        p.pro_scale,
+        p.pro_relegation,
+        p.pro_cusground,
+        p.pro_viewgress,
+        p.pro_createTime,
+        p.pro_ip,
+        s.sale_cusName,
+        s.sale_name
+        FROM
+        project p
+        JOIN sale s ON p.pro_cusCode = s.sale_cusCode
+        <where>
+            <if test="deptName != null and deptName != '' " >
+                AND pro_dept LIKE concat('%', #{deptName}, '%')
+            </if>
+            <if test="saleName != null and saleName != '' " >
+                AND sale_name = #{saleName}
+            </if>
+
+        </where>
+    </select>
+
+    <!--通过销售名称查看某个部门的项目信息-->
+    <!--<select id="selectProjectInfoVoBySaleName" parameterType="com.rayootech.bean.sale.Sale" resultMap="ProjectInfoVo">-->
+        <!--SELECT-->
+        <!--p.pro_id,-->
+        <!--p.pro_dept,-->
+        <!--p.pro_code,-->
+        <!--p.pro_name,-->
+        <!--p.pro_state,-->
+        <!--p.pro_type,-->
+        <!--p.pro_period,-->
+        <!--p.pro_scale,-->
+        <!--p.pro_relegation,-->
+        <!--p.pro_cusground,-->
+        <!--p.pro_viewgress,-->
+        <!--p.pro_createTime,-->
+        <!--p.pro_ip,-->
+        <!--s.sale_cusName,-->
+        <!--s.sale_name-->
+        <!--FROM-->
+        <!--project p-->
+        <!--JOIN (-->
+        <!--SELECT-->
+        <!--*-->
+        <!--FROM-->
+        <!--sale-->
+        <!--WHERE-->
+        <!--sale_dept LIKE concat('%', #{saleDept}, '%')-->
+        <!--AND sale_name = #{saleName}-->
+        <!--) s ON p.pro_cusCode = s.sale_cusCode-->
+    <!--</select>-->
+
+    <!--通过ID查看项目信息-->
+    <select id="selectProjectInfoVoByByProId" resultMap="ProjectInfoVo">
+        SELECT
+            m.pro_id,
+            m.pro_dept,
+            s.sale_name,
+            s.sale_cusName,
+            m.pro_cusground,
+            m.pro_code,
+            m.pro_name,
+            m.pro_type,
+            m.pro_period,
+            m.pro_scale,
+            m.pro_relegation,
+            m.pro_viewgress,
+            m.pro_state,
+            m.pro_createtime,
+            m.pro_ip
+        FROM
+            sale s
+        JOIN (
+            SELECT
+                *
+            FROM
+                project
+            WHERE
+                pro_id = #{proId}
+        ) m ON s.sale_cusCode = m.pro_cusCode
+    </select>
+
+    <!--更新项目信息-->
+    <update id="updateProject" parameterType="com.rayootech.bean.Vo.ProjectInfoVo">
+        update project
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="proDept != null and proDept != ''">pro_dept = #{proDept},</if>
+            <if test="proCode != null and proCode != ''">pro_code= #{proCode},</if>
+            <if test="proName != null and proName != ''">pro_name= #{proName},</if>
+            <if test="proState != null">pro_state= #{proState},</if>
+            <if test="proType != null and proType != ''">pro_type= #{proType},</if>
+            <if test="proPeriod != null and proPeriod != ''">pro_period= #{proPeriod},</if>
+            <if test="proScale != null and proScale != ''">pro_scale= #{proScale},</if>
+            <if test="proRelegation != null and proRelegation != ''">pro_relegation= #{proRelegation},</if>
+            <if test="proCusground != null and proCusground != ''">pro_cusground= #{proCusground},</if>
+            <if test="proViewgress != null and proViewgress != ''">pro_viewgress= #{proViewgress},</if>
+        </trim>
+        where pro_id = #{proId}
+    </update>
+
+
+    <!--通过部门名称查询项目名称-->
+    <select id="selectProNameByDeptName" parameterType="string" resultType="string">
+        SELECT pro_name FROM project WHERE pro_dept LIKE concat('%', #{proDept}, '%') AND pro_state = 0
+    </select>
+
+    <!--查询所有的项目名称-->
+    <select id="getProName" resultType="string" >
+        select pro_name from project
+    </select>
+
+    <!--查询所有的项目编码-->
+    <select id="getProCode" resultType="string">
+        SELECT pro_code FROM project
+    </select>
+
+
+
+    <select id="selectSaleProjectInfoVoList" resultMap="ProjectInfoVo" parameterType="string">
+        SELECT
+            p.pro_id,
+            p.pro_dept,
+            p.pro_code,
+            p.pro_name,
+            p.pro_state,
+            p.pro_type,
+            p.pro_period,
+            p.pro_scale,
+            p.pro_relegation,
+            p.pro_cusground,
+            p.pro_viewgress,
+            p.pro_createTime,
+            p.pro_ip,
+            s.sale_cusName,
+            s.sale_name
+        FROM
+          project p
+        RIGHT JOIN ( SELECT sale_cusCode, sale_cusName, sale_name FROM sale WHERE sale_code IN ( ${param1})) s ON p.pro_cusCode = s.sale_cusCode WHERE
+        <if test="param2 != null and param2 != ''  ">
+            s.sale_name = #{param2} and
+        </if>
+        pro_cusCode IS NOT NULL
+    </select>
+
+    <select id="selectPostNameByProName" parameterType="string" resultType="string">
+        SELECT
+                req_post
+            FROM
+                requirement r
+            JOIN project p ON p.pro_id = r.pro_id
+            WHERE
+                pro_name = #{proName}
+    </select>
+
+
+    <select id="getSaleproName" parameterType="string" resultType="string">
+       SELECT
+   pro_name
+FROM
+   project
+   JOIN sale ON project.pro_cusCode = sale.sale_cusCode
+WHERE
+   sale_code in (${dataScope})
+    </select>
+
+
+    <select id="getsalepro" resultType="string" parameterType="string">
+
+SELECT
+   pro_name
+FROM
+   project
+WHERE
+   pro_cusCode in ( SELECT sale_cusCode FROM sale WHERE sale_code = #{hrEmail} )
+</select>
+
+
+
+
+
+
+
+
+</mapper>

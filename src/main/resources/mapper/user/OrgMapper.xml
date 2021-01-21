@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.OrgMapper">
+  <resultMap id="BaseResultMap" type="com.rayootech.bean.Org">
+    <id column="org_id" jdbcType="BIGINT" property="orgId" />
+    <result column="org_name" jdbcType="VARCHAR" property="orgName" />
+    <result column="parent_id" jdbcType="BIGINT" property="parentId" />
+    <result column="ancestors" jdbcType="VARCHAR" property="ancestors" />
+    <result column="order_num" jdbcType="INTEGER" property="orderNum" />
+    <result column="org_type" jdbcType="VARCHAR" property="orgType" />
+    <result column="is_deliver" jdbcType="VARCHAR" property="isDeliver" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    org_id, org_name, parent_id,ancestors,order_num,create_time,org_type,is_deliver
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from org
+    where org_id = #{orgId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from org
+    where org_id = #{orgId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.rayootech.bean.Org">
+    insert into org (org_id, org_name, parent_id,ancestors,order_num,create_time,org_type,is_deliver
+      )
+    values (#{orgId,jdbcType=BIGINT}, #{orgName,jdbcType=VARCHAR}, #{parentId,jdbcType=BIGINT},
+    #{ancestors,jdbcType=VARCHAR},#{orderNum,jdbcType=INTEGER},#{createTime},#{orgType},#{isDeliver}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.rayootech.bean.Org">
+    insert into org
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="orgId != null">
+        org_id,
+      </if>
+      <if test="orgName != null">
+        org_name,
+      </if>
+      <if test="parentId != null">
+        parent_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="orgId != null">
+        #{orgId,jdbcType=BIGINT},
+      </if>
+      <if test="orgName != null">
+        #{orgName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null">
+        #{parentId,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.rayootech.bean.Org">
+    update org
+    <set>
+      <if test="orgName != null">
+        org_name = #{orgName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null">
+        parent_id = #{parentId,jdbcType=BIGINT},
+      </if>
+      <if test="ancestors != null and ancestors != ''">ancestors = #{ancestors},</if>
+      <if test="orderNum != null and orderNum != ''">order_num = #{orderNum},</if>
+      <if test="orgType != null and orgType != ''">org_type = #{orgType},</if>
+      <if test="isDeliver != null and isDeliver != ''">is_deliver = #{isDeliver},</if>
+    </set>
+    where org_id = #{orgId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.rayootech.bean.Org">
+    update org
+    set org_name = #{orgName,jdbcType=VARCHAR},
+      parent_id = #{parentId,jdbcType=BIGINT}
+    where org_id = #{orgId,jdbcType=BIGINT}
+  </update>
+
+
+
+  <select id="selectOrgList" parameterType="com.rayootech.bean.Org" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from org
+    <where>
+      <if test="orgName != null and orgName != ''">
+        AND org_name like concat('%', #{orgName}, '%')
+      </if>
+
+    </where>
+    order by parent_id, order_num
+  </select>
+
+
+
+  <select id="checkOrgNameUnique" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from org
+    where org_name=#{orgName} and parent_id = #{parentId} limit 1
+  </select>
+
+
+  <select id="hasChildByOrgId" parameterType="Long" resultType="int">
+		select count(1) from org
+		where parent_id = #{deptId}
+	</select>
+
+
+  <select id="checkOrgExistUser" parameterType="Long" resultType="int">
+		select count(1) from user where dept_id = #{orgId} or post_id = #{orgId}
+	</select>
+
+
+  <select id="selectChildrenOrgById" parameterType="Long" resultMap="BaseResultMap">
+		select * from org where find_in_set(#{orgId}, ancestors)
+	</select>
+
+
+  <update id="updateDeptChildren" parameterType="java.util.List">
+    update org set ancestors =
+    <foreach collection="orgs" item="item" index="index"
+             separator=" " open="case org_id" close="end">
+      when #{item.orgId} then #{item.ancestors}
+    </foreach>
+    where org_id in
+    <foreach collection="orgs" item="item" index="index"
+             separator="," open="(" close=")">
+      #{item.orgId}
+    </foreach>
+  </update>
+
+
+  <select id="getDeptNa" resultType="string">
+    SELECT
+     org_name
+    FROM
+     org
+    WHERE
+     org_id IN (
+      SELECT DISTINCT
+       parent_id
+      FROM
+       org
+      WHERE
+       is_deliver = 'J'
+      AND org_type = 'P'
+     )
+  </select>
+
+  <select id="getDeptByUser" parameterType="string" resultType="string">
+    select org_name from org where org_id in (select dept_id from user where user_name = #{name})
+  </select>
+
+
+
+
+</mapper>

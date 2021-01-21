@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.deliver.AttendanceMapper">
+    
+    <resultMap type="Attendance" id="AttendanceResult">
+        <result property="attId"    column="att_id"    />
+        <result property="staffId"    column="staff_id"    />
+        <result property="attRealday"    column="att_realDay"    />
+        <result property="attLegalday"    column="att_legalDay"    />
+        <result property="attTestday"    column="att_testDay"    />
+        <result property="attFormalday"    column="att_formalDay"    />
+        <result property="attTestask"    column="att_testAsk"    />
+        <result property="attFormalask"    column="att_formalAsk"    />
+        <result property="attTypask"    column="att_typAsk"    />
+        <result property="attState"    column="att_state"    />
+        <result property="attCreattime"    column="att_creatTime"    />
+        <result property="attIp"    column="att_ip"    />
+        <result property="attTime"    column="att_time"    />
+    </resultMap>
+
+    <resultMap type="com.rayootech.bean.Vo.AttendanceVo" id="AttendanceVoResult">
+
+        <result property="attId"    column="att_id"    />
+        <result property="canProName"    column="can_proName"    />
+        <result property="staffId"    column="staff_id"    />
+        <result property="canId"    column="can_id"    />
+        <result property="staffName"    column="staff_name"    />
+        <result property="staffCode"    column="staff_code"    />
+        <result property="staffIsout"    column="staff_isOut"    />
+        <result property="staffState" column="staff_state"/>
+
+        <result property="attRealday"    column="att_realDay"    />
+        <result property="attLegalday"    column="att_legalDay"    />
+        <result property="attTestday"    column="att_testDay"    />
+        <result property="attFormalday"    column="att_formalDay"    />
+        <result property="attTestask"    column="att_testAsk"    />
+        <result property="attFormalask"    column="att_formalAsk"    />
+        <result property="attTypask"    column="att_typAsk"    />
+        <result property="attState"    column="att_state"    />
+        <result property="attCreattime"    column="att_creatTime"    />
+        <result property="attIp"    column="att_ip"    />
+        <result property="attTime"    column="att_time"    />
+    </resultMap>
+
+
+        
+    <insert id="addAtt" parameterType="Attendance" useGeneratedKeys="true" keyProperty="attId">
+        insert into attendance
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="staffId != null">staff_id,</if>
+            <if test="attRealday != null">att_realDay,</if>
+            <if test="attLegalday != null">att_legalDay,</if>
+            <if test="attTestday != null">att_testDay,</if>
+            <if test="attFormalday != null">att_formalDay,</if>
+            <if test="attTestask != null">att_testAsk,</if>
+            <if test="attFormalask != null">att_formalAsk,</if>
+            <if test="attTypask != null">att_typAsk,</if>
+            <if test="attState != null">att_state,</if>
+            <if test="attCreattime != null">att_creatTime,</if>
+            <if test="attIp != null">att_ip,</if>
+            <if test="attTime != null">att_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="staffId != null">#{staffId},</if>
+            <if test="attRealday != null">#{attRealday},</if>
+            <if test="attLegalday != null">#{attLegalday},</if>
+            <if test="attTestday != null">#{attTestday},</if>
+            <if test="attFormalday != null">#{attFormalday},</if>
+            <if test="attTestask != null">#{attTestask},</if>
+            <if test="attFormalask != null">#{attFormalask},</if>
+            <if test="attTypask != null">#{attTypask},</if>
+            <if test="attState != null">#{attState},</if>
+            <if test="attCreattime != null">#{attCreattime},</if>
+            <if test="attIp != null">#{attIp},</if>
+            <if test="attTime != null">#{attTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateAtt" parameterType="Attendance">
+        update attendance
+        <trim prefix="SET" suffixOverrides=",">
+
+            <if test="attRealday != null">att_realDay = #{attRealday},</if>
+            <if test="attLegalday != null">att_legalDay = #{attLegalday},</if>
+            <if test="attTestday != null">att_testDay = #{attTestday},</if>
+            <if test="attFormalday != null">att_formalDay = #{attFormalday},</if>
+            <if test="attTestask != null">att_testAsk = #{attTestask},</if>
+            <if test="attFormalask != null">att_formalAsk = #{attFormalask},</if>
+            <if test="attTypask != null">att_typAsk = #{attTypask},</if>
+            <if test="attState != null">att_state = #{attState},</if>
+            <if test="attCreattime != null">att_creatTime = #{attCreattime},</if>
+            <if test="attIp != null">att_ip = #{attIp},</if>
+            <if test="attTime != null">att_time = #{attTime},</if>
+        </trim>
+        where att_id = #{attId}
+    </update>
+
+    <select id="getAttList" parameterType="com.rayootech.bean.Vo.AttendanceVo" resultMap="AttendanceVoResult">
+      SELECT
+      a.att_id,
+	a.staff_id,
+	a.att_typAsk,
+	a.att_testDay,
+	a.att_testAsk,
+	a.att_realDay,
+	a.att_legalDay,
+	a.att_formalAsk,
+	att_formalDay,
+	a.att_state,
+	a.att_creatTime,
+	a.att_ip,
+    a.att_time,
+	b.staff_isOut,
+	b.staff_code,
+	b.can_proName,
+	b.staff_name
+	from attendance a
+	LEFT JOIN (
+SELECT
+	c.staff_id,
+	c.staff_isOut,
+	c.staff_code,
+	can_proName,
+	c.staff_name
+FROM
+	(
+SELECT
+	staff.staff_code,
+	staff.staff_id,
+	staff.staff_isOut,
+	staff.staff_name,
+	talks.can_id
+FROM
+	staff
+	LEFT JOIN talks ON staff.talks_id = talks.talks_id WHERE staff_state = 0
+	) c
+	LEFT JOIN candidate ON c.can_id = candidate.can_id
+	) b ON a.staff_id = b.staff_id
+	<where>
+        <if test="attTime != null" >DATE_FORMAT(att_time , '%Y-%m' ) = DATE_FORMAT(#{attTime}, '%Y-%m' )</if>
+        <if test="staffName != null" > staff_name = #{staffName}</if>
+        <if test="canProName != null" >can_proName = #{canProName}</if>
+    </where>
+    </select>
+    <select id="selsectAttList" parameterType="com.rayootech.bean.Vo.AttendanceVo" resultMap="AttendanceVoResult">
+    SELECT
+  can_proName,
+  c.staff_name,
+	c.staff_isOut,
+	c.staff_code,
+	c.staff_state,
+	c.staff_id,
+	c.att_time
+from candidate RIGHT JOIN (
+	   SELECT
+  can_id,
+  t.staff_name,
+	t.staff_isOut,
+	t.staff_code,
+	t.staff_state,
+	t.staff_id,
+	t.att_time
+from talks  right JOIN (
+SELECT
+  staff_name,
+	staff_isOut,
+	staff_code,
+	staff_state,
+	talks_id,
+	s.staff_id,
+	a.att_time
+FROM staff s LEFT JOIN (
+select att_time,staff_id FROM attendance
+-- WHERE DATE_FORMAT(att_time , '%Y-%m' ) = DATE_FORMAT( CURDATE() , '%Y-%m' )
+WHERE DATE_FORMAT(att_time , '%Y-%m' ) = DATE_FORMAT(#{attTime}, '%Y-%m' )
+) a on a.staff_id = s.staff_id  where   staff_state = 0
+) t on t.talks_id = talks.talks_id where talks.talks_result = 0
+	) c on c.can_id = candidate.can_id
+	WHERE att_time is null and candidate.can_resState = 0
+    </select>
+
+    <select id="getAttById" resultMap="AttendanceVoResult" parameterType="com.rayootech.bean.Vo.AttendanceVo">
+            SELECT
+        a.att_id,
+	a.staff_id,
+	a.att_typAsk,
+	a.att_testDay,
+	a.att_testAsk,
+	a.att_realDay,
+	a.att_legalDay,
+	a.att_formalAsk,
+	att_formalDay,
+	a.att_state,
+	a.att_creatTime,
+	a.att_ip,
+    a.att_time,
+	b.staff_isOut,
+	b.staff_code,
+	b.can_proName,
+	b.staff_name
+	from attendance a
+	LEFT JOIN (
+SELECT
+	c.staff_id,
+	c.staff_isOut,
+	c.staff_code,
+	can_proName,
+	c.staff_name
+FROM
+	(
+SELECT
+	staff.staff_code,
+	staff.staff_id,
+	staff.staff_isOut,
+	staff.staff_name,
+	talks.can_id
+FROM
+	staff
+	LEFT JOIN talks ON staff.talks_id = talks.talks_id WHERE staff_state = 0
+	) c
+	LEFT JOIN candidate ON c.can_id = candidate.can_id
+	) b ON a.staff_id = b.staff_id
+	<where>
+        att_id = #{attId}
+    </where>
+    </select>
+
+    <select id="getFormal" parameterType="string" resultMap="AttendanceVoResult">
+SELECT
+	can_proName,
+	t.staff_name,
+	t.staff_isOut,
+	t.staff_code,
+	 t.staff_id
+FROM
+	candidate c
+JOIN ( SELECT
+	staff_name,
+	staff_isOut,
+	staff_code,
+	staff_id,
+	s.can_id
+FROM
+	staff
+	LEFT JOIN
+	talks s
+	ON s.talks_id = staff.talks_id) t
+	ON t.can_id = c.can_id
+	where staff_name = #{staffName}
+    </select>
+    <select id="selectAttimeById" resultType="string" parameterType="integer">
+        select att_time from attendance where staff_id = #{staffId}
+    </select>
+</mapper>

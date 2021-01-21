@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.recruitment.TalksVoMapper">
+
+    <resultMap type="TalksVo" id="TalksVoResult">
+        <result property="canProName"    column="can_proName"    />
+		<result property="canHrname" column="can_hrName"/>
+		<result property="backId"    column="back_id"    />
+        <result property="canDept"    column="can_dept"    />
+        <result property="backName"    column="back_name"    />
+        <result property="backResult"    column="back_result"    />
+        <result property="backEvalua"    column="back_evalua"    />
+        <result property="backOfferLow"    column="back_offerLow"    />
+        <result property="backOfferHigh"    column="back_offerHigh"    />
+		<result property="talksResult"    column="talks_result"    />
+		<result property="talksSalary"    column="talks_salary"    />
+		<result property="talksTime"    column="talks_time"    />
+		<result property="talksState"    column="talks_state"    />
+		<result property="canId"    column="can_id"    />
+		<result property="staffCost" column="staffCost"/>
+		<result property="talksIp" column="talks_ip"/>
+    </resultMap>
+
+	<select id="selectTalksList"  parameterType="TalksVo" resultMap="TalksVoResult">
+		SELECT
+		t.can_id,
+		t.back_id,
+		t.can_proName,
+		t.can_dept,
+		t.back_name,
+		t.back_result,
+		t.back_evalua,
+		t.back_offerLow,
+		t.back_offerHigh
+		from talks RIGHT JOIN(
+		SELECT
+		c.can_id,
+		c.back_id,
+		can_proName,
+		can_dept,
+		c.back_name,
+		c.back_result,
+		c.back_evalua,
+		c.back_offerLow,
+		c.back_offerHigh
+		FROM
+		candidate
+		JOIN (
+		SELECT
+		can_id,
+		f.back_id,
+		f.back_name,
+		f.back_result,
+		f.back_evalua,
+		f.back_offerLow,
+		f.back_offerHigh
+		FROM interview JOIN (
+		SELECT
+		view_id,
+		back_id,
+		back_name,
+		back_result,
+		back_evalua,
+		back_offerLow,
+		back_offerHigh
+		FROM feedback WHERE back_result = 0 ) f ON interview.view_id = f.view_id
+		<where>
+			<if test="backName != null and backName != ''">and back_name like concat('%', #{backName}, '%')</if>
+		</where>
+		) c ON candidate.can_id = c.can_id
+		<where>
+			<if test="canHremail != null and canHremail != ''">
+				can_hrEmail in (${canHremail})
+			</if>
+			<if test="canProName != null and canProName != ''">and can_proName like concat('%', #{canProName}, '%')</if>
+			<if test="canDept != null and canDept != ''">and can_dept like concat('%', #{canDept}, '%')</if>
+			<if test="canHrname != null and canHrname != ''">and can_hrName =  #{canHrname}</if>
+		</where>
+		)t on t.can_id = talks.can_id where talks_result is null
+	</select>
+
+
+
+	<select id="select" resultMap="TalksVoResult" parameterType="TalksVo">
+		 SELECT
+			can_proName,
+			can_dept,
+			c.back_name,
+			c.back_result,
+			c.back_evalua,
+			c.back_offerLow,
+			c.back_offerHigh
+		FROM
+			candidate
+		JOIN (
+		SELECT
+		   can_id,
+			 f.back_name,
+			 f.back_result,
+			 f.back_evalua,
+			 f.back_offerLow,
+			 f.back_offerHigh
+			 FROM interview JOIN (
+			 SELECT
+				 view_id,
+				 back_name,
+				 back_result,
+				 back_evalua,
+				 back_offerLow,
+				 back_offerHigh
+				 FROM feedback WHERE back_result = 0 ) f ON interview.view_id = f.view_id ) c ON candidate.can_id = c.can_id
+
+	</select>
+</mapper>

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rayootech.mapper.deliver.ResumeMapper">
+
+    <resultMap type="com.rayootech.bean.deliver.ResumeCheck" id="ResumecheckResult">
+        <result property="checkId"    column="check_id"    />
+        <result property="canId"    column="can_id"    />
+        <result property="checkState"    column="check_state"    />
+        <result property="checkName"    column="check_name"    />
+        <result property="checkCreatetime"    column="check_createTime"    />
+        <result property="checkIp"    column="check_ip"    />
+        <result property="checkDept"    column="check_dept"    />
+        <result property="checkPubstate"    column="check_pubState"    />
+        <result property="deptId"    column="dept_id"    />
+    </resultMap>
+
+    <resultMap type="com.rayootech.bean.Vo.ResumeResultVo" id="ResumeResultVo">
+        <result property="canId"    column="can_id"    />
+        <result property="canProName"    column="can_proName"    />
+        <result property="canDept" column="can_dept" />
+        <result property="canName"    column="can_name"    />
+        <result property="canSex"    column="can_sex"    />
+        <result property="canPhone"    column="can_phone"    />
+        <result property="canPost"    column="can_post"    />
+        <result property="canHrname"    column="can_hrName"    />
+        <result property="checkState"    column="check_state"    />
+        <result property="checkName"    column="check_name"    />
+        <result property="checkCreatetime"    column="check_createTime"    />
+        <result property="checkIp"    column="check_ip"    />
+        <result property="checkPubstate"    column="check_pubState"    />
+        <result property="canResumecopy"    column="can_resumeCopy"    />
+        <result property="canText"    column="can_text"    />
+    </resultMap>
+
+    <insert id="insertResumecheck" parameterType="com.rayootech.bean.deliver.ResumeCheck" useGeneratedKeys="true" keyProperty="checkId">
+        insert into resumecheck
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="canId != null">can_id,</if>
+            <if test="checkState != null">check_state,</if>
+            <if test="checkName != null">check_name,</if>
+            <if test="checkCreatetime != null">check_createTime,</if>
+            <if test="checkIp != null">check_ip,</if>
+            <if test="checkDept != null">check_dept,</if>
+            <if test="checkPubstate != null">check_pubState,</if>
+            <if test="deptId != null">dept_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="canId != null">#{canId},</if>
+            <if test="checkState != null">#{checkState},</if>
+            <if test="checkName != null">#{checkName},</if>
+            <if test="checkCreatetime != null">#{checkCreatetime},</if>
+            <if test="checkIp != null">#{checkIp},</if>
+            <if test="checkDept != null">#{checkDept},</if>
+            <if test="checkPubstate != null">#{checkPubstate},</if>
+            <if test="deptId != null">#{deptId},</if>
+        </trim>
+    </insert>
+
+    <select id="selectResumeByCanId" parameterType="integer" resultMap="ResumecheckResult">
+        SELECT * FROM resumecheck WHERE can_id = #{canId}
+    </select>
+
+    <!--更新简历审核结果-->
+    <update id="updateResumecheck" parameterType="com.rayootech.bean.Vo.ResumeResultVo">
+        update resumecheck
+        <set>
+            <if test="checkState != null">check_state = #{checkState},</if>
+            <if test="checkName != null">check_name = #{checkName},</if>
+            <if test="checkCreatetime != null">check_createTime = #{checkCreatetime},</if>
+            <if test="checkIp != null">check_ip = #{checkIp},</if>
+            <if test="checkPubstate != null">check_pubState = #{checkPubstate}</if>
+        </set>
+        where can_id = #{canId}
+    </update>
+
+
+    <insert id="insertResumecheckBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="checkId">
+      INSERT INTO resumecheck(can_id,check_state,check_name,check_createTime,check_ip,check_dept,check_pubState)
+      VALUES
+        <foreach item="resumeCheck" collection="list" separator=",">
+            (
+            #{resumeCheck.canId},
+            #{resumeCheck.checkState},
+            #{resumeCheck.checkName},
+            #{resumeCheck.checkCreatetime},
+            #{resumeCheck.checkIp},
+            #{resumeCheck.checkDept},
+            #{resumeCheck.checkPubstate}
+            )
+        </foreach>
+    </insert>
+
+    <!--查看简历审核结果-->
+    <select id="selectResumeResultVo" parameterType="com.rayootech.bean.Vo.ResumeResultVo" resultMap="ResumeResultVo">
+        SELECT
+        *
+        FROM
+        (
+        SELECT
+        r.can_id,
+        can_proName,
+        can_dept,
+        can_hrName,
+        can_text,
+        can_name,
+        can_sex,
+        can_phone,
+        can_post,
+        check_state,
+        check_name,
+        check_pubState,
+        check_createTime,
+        check_ip
+        FROM
+        (SELECT can_id,
+        can_proName,
+        can_dept,
+        can_hrName,
+        can_text,
+        can_name,
+        can_sex,
+        can_phone,
+        can_post FROM candidate
+        <where>
+            <if test="canHremail != null and canHremail != ''">
+                can_hrEmail in (${canHremail})
+            </if>
+        </where> ) c
+        JOIN (SELECT * FROM resumecheck) r ON r.can_id = c.can_id
+        ) m
+        <where>
+            <if test="canHrname != null and canHrname != ''">AND m.can_hrName = #{canHrname}</if>
+            <if test="canDept != null and canDept != ''">AND m.can_dept = #{canDept}</if>
+            <if test="canProName != null  and canProName != ''">AND m.can_proName = #{canProName}</if>
+            <if test="canPost != null and canPost != ''">AND m.can_post = #{canPost}</if>
+            <if test="checkState != null">AND m.check_state = #{checkState}</if>
+            <if test="checkState != null">AND m.check_state = #{checkState}</if>
+            <if test="checkCreatetime != null"> AND TO_DAYS(m.check_createTime) = TO_DAYS((#{checkCreatetime}))</if>
+        </where>
+    </select>
+
+    <!--通过ID查询简历审核结果-->
+    <select id="selectResumeVoById" parameterType="int" resultMap="ResumeResultVo">
+      SELECT
+            r.can_id,
+            can_proName,
+            can_dept,
+            can_hrName,
+            can_name,
+            can_sex,
+            can_phone,
+            can_post,
+            can_text,
+            check_state,
+            check_name,
+            check_pubState,
+            check_createTime
+        FROM
+            candidate c
+        JOIN resumecheck r ON c.can_id = r.can_id
+        WHERE
+            r.can_id = #{canId}
+    </select>
+
+    <select id="selectSaleResumeResultVo" resultMap="ResumeResultVo" parameterType="com.rayootech.bean.Vo.ResumeResultVo">
+     SELECT
+         *
+        FROM
+         (
+        SELECT
+         r.can_id,
+         can_proName,
+         can_dept,
+         can_hrName,
+         can_name,
+         can_sex,
+         can_phone,
+         can_post,
+         can_text,
+         check_state,
+         check_name,
+         check_pubState,
+         check_createTime,
+         check_ip
+        FROM
+         candidate c
+         JOIN resumecheck r ON r.can_id = c.can_id
+         ) m
+        WHERE
+         can_proName IN (
+        SELECT
+         pro_name
+        FROM
+         project p
+         RIGHT JOIN ( SELECT sale_cusCode, sale_cusName, sale_name FROM sale
+        <where>
+            <if test="canHremail != null and canHremail != ''">
+                sale_code in (${canHremail})
+            </if>
+        </where>) t ON p.pro_cusCode = t.sale_cusCode
+        WHERE
+         pro_cusCode IS NOT NULL
+         )
+
+            <if test="canHrname != null and canHrname != ''">AND can_hrName = #{canHrname}</if>
+            <if test="canDept != null and canDept != ''">AND can_dept = #{canDept}</if>
+            <if test="canProName != null  and canProName != ''">AND can_proName = #{canProName}</if>
+            <if test="canPost != null and canPost != ''">AND can_post = #{canPost}</if>
+            <if test="checkState != null">AND  check_state = #{checkState}</if>
+            <if test="checkCreatetime != null"> AND TO_DAYS(check_createTime) = TO_DAYS((#{checkCreatetime}))</if>
+
+    </select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>
